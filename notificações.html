@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações | Sistema Educacional</title>
+    <!-- Importando Font Awesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9500;
+            --primary-light: #ffbb33;
+            --primary-dark: #ff6d00;
+            --secondary-color: #ffcc80;
+            --text-color: #333;
+            --text-light: #6b7280;
+            --bg-color: #fff;
+            --bg-secondary: #fffaf0;
+            --border-color: #ffe0b2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(255, 149, 0, 0.1), 0 4px 6px -2px rgba(255, 149, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #ffcc80 0%, #ff9500 100%);
+            --gradient-secondary: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            --animation-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8e1 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all var(--animation-speed);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Notificações Estilos */
+        .notification-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .notification-header {
+            background: var(--gradient-secondary);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-title {
+            font-size: 1.25rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .notification-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 30px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .notification-filter {
+            display: flex;
+            padding: 1rem 1.5rem;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-button:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .notification-list {
+            padding: 0;
+        }
+
+        .notification-item {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+            transition: all var(--animation-speed);
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item.unread {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-secondary);
+            color: var(--primary-color);
+            flex-shrink: 0;
+            font-size: 1.25rem;
+        }
+
+        .notification-item.success .notification-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .notification-item.warning .notification-icon {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .notification-item.danger .notification-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .notification-time {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .notification-message {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .notification-category {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .notification-actions-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notification-action {
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color var(--animation-speed);
+        }
+
+        .notification-action:hover {
+            color: var(--primary-color);
+        }
+
+        .notification-empty {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .notification-empty-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .notification-empty-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .notification-pagination {
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .page-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            transition: all var(--animation-speed);
+            cursor: pointer;
+        }
+
+        .page-button:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .notification-filter {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                justify-content: flex-start;
+            }
+            
+            .notification-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .notification-actions-menu {
+                align-self: flex-end;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>Notificações</h1>
+        </div>
+        <div class="header-actions">
+            <a href="dashboard-admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="notification-container">
+            <div class="notification-header">
+                <div class="notification-title">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificações</span>
+                    <div class="notification-count">12</div>
+                </div>
+                <div class="notification-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-check-double"></i>
+                        Marcar todas como lidas
+                    </button>
+                </div>
+            </div>
+
+            <div class="notification-filter">
+                <button class="filter-button active">
+                    <i class="fas fa-list"></i>
+                    Todas
+                </button>
+                <button class="filter-button">
+                    <i class="fas fa-book"></i>
+                    Acadêmico
+                </button>
+                <button class="filter-button">
+                    <i class="fas fa-calendar-alt"></i>
+                    Eventos
+                </button>
+                <button class="filter-button">
+                    <i class="fas fa-bullhorn"></i>
+                    Anúncios
+                </button>
+                <button class="filter-button">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Avisos
+                </button>
+            </div>
+
+            <div class="notification-list">
+                <!-- Notificação não lida -->
+                <div class="notification-item unread">
+                    <div class="notification-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Nova apostila disponível</div>
+                            <div class="notification-time">Há 25 minutos</div>
+                        </div>
+                        <div class="notification-message">
+                            A apostila "Matemática Avançada para Ensino Médio" foi disponibilizada para download.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Acadêmico</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Marcar como lida">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificação de sucesso não lida -->
+                <div class="notification-item success unread">
+                    <div class="notification-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Atividade avaliada</div>
+                            <div class="notification-time">Há 1 hora</div>
+                        </div>
+                        <div class="notification-message">
+                            Sua atividade "Projeto de Ciências" foi avaliada pelo professor. Você recebeu nota 9.5.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Acadêmico</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Marcar como lida">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificação de aviso -->
+                <div class="notification-item warning unread">
+                    <div class="notification-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Prazo de entrega se aproximando</div>
+                            <div class="notification-time">Há 3 horas</div>
+                        </div>
+                        <div class="notification-message">
+                            O prazo para entrega da atividade "Redação: Meio Ambiente" vence amanhã às 23:59.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Avisos</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Marcar como lida">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificação já lida -->
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Novo evento no calendário</div>
+                            <div class="notification-time">Há 1 dia</div>
+                        </div>
+                        <div class="notification-message">
+                            Foi adicionado um novo evento no calendário: "Feira de Ciências" para o dia 15/10/2023.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Eventos</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificação de alerta -->
+                <div class="notification-item danger">
+                    <div class="notification-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Atividade pendente</div>
+                            <div class="notification-time">Há 2 dias</div>
+                        </div>
+                        <div class="notification-message">
+                            Você não entregou a atividade "Resolução de Equações de 2º Grau" que venceu ontem.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Avisos</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificação já lida -->
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title-row">
+                            <div class="notification-message-title">Anúncio da direção</div>
+                            <div class="notification-time">Há 4 dias</div>
+                        </div>
+                        <div class="notification-message">
+                            A diretoria informa que a reunião de pais e mestres foi reagendada para o dia 25/10/2023 às 19h.
+                        </div>
+                        <div class="notification-meta">
+                            <div class="notification-category">Anúncios</div>
+                            <div class="notification-actions-menu">
+                                <button class="notification-action" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notification-pagination">
+                <button class="page-button">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="page-button active">1</button>
+                <button class="page-button">2</button>
+                <button class="page-button">3</button>
+                <button class="page-button">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botões de filtro
+            const filterButtons = document.querySelectorAll('.filter-button');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove a classe active de todos os botões
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Adiciona a classe active ao botão clicado
+                    this.classList.add('active');
+                    
+                    // Aqui você poderia implementar a lógica de filtragem das notificações
+                    // Por exemplo, filtrando por categoria ou por status (lidas/não lidas)
+                });
+            });
+            
+            // Marcar notificação como lida
+            const markReadButtons = document.querySelectorAll('.notification-action[title="Marcar como lida"]');
+            
+            markReadButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Previne que o clique propague para o item pai
+                    
+                    // Pega o item de notificação pai
+                    const notificationItem = this.closest('.notification-item');
+                    
+                    // Remove a classe unread
+                    notificationItem.classList.remove('unread');
+                    
+                    // Remove o botão "Marcar como lida"
+                    this.remove();
+                    
+                    // Atualiza o contador de notificações
+                    updateNotificationCount();
+                });
+            });
+            
+            // Arquivar notificação
+            const archiveButtons = document.querySelectorAll('.notification-action[title="Arquivar"]');
+            
+            archiveButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Previne que o clique propague para o item pai
+                    
+                    // Pega o item de notificação pai
+                    const notificationItem = this.closest('.notification-item');
+                    
+                    // Anima a saída e depois remove o elemento
+                    notificationItem.style.opacity = '0';
+                    notificationItem.style.height = `${notificationItem.offsetHeight}px`;
+                    
+                    setTimeout(() => {
+                        notificationItem.style.height = '0';
+                        notificationItem.style.padding = '0';
+                        notificationItem.style.margin = '0';
+                        notificationItem.style.borderWidth = '0';
+                        
+                        setTimeout(() => {
+                            notificationItem.remove();
+                            
+                            // Verifica se ainda existem notificações
+                            checkEmptyNotifications();
+                            
+                            // Atualiza o contador de notificações
+                            updateNotificationCount();
+                        }, 300);
+                    }, 300);
+                });
+            });
+            
+            // Marcar todas como lidas
+            const markAllReadButton = document.querySelector('.btn-outline');
+            
+            markAllReadButton.addEventListener('click', function() {
+                // Pega todas as notificações não lidas
+                const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                
+                unreadNotifications.forEach(item => {
+                    // Remove a classe unread
+                    item.classList.remove('unread');
+                    
+                    // Remove o botão "Marcar como lida" se existir
+                    const markReadButton = item.querySelector('.notification-action[title="Marcar como lida"]');
+                    if (markReadButton) {
+                        markReadButton.remove();
+                    }
+                });
+                
+                // Atualiza o contador de notificações
+                updateNotificationCount();
+            });
+            
+            // Clique no item de notificação
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Aqui você poderia implementar a lógica para abrir o detalhe da notificação
+                    // ou redirecionar para uma página relacionada
+                    
+                    // Se for uma notificação não lida, marcar como lida
+                    if (this.classList.contains('unread')) {
+                        this.classList.remove('unread');
+                        
+                        // Remove o botão "Marcar como lida" se existir
+                        const markReadButton = this.querySelector('.notification-action[title="Marcar como lida"]');
+                        if (markReadButton) {
+                            markReadButton.remove();
+                        }
+                        
+                        // Atualiza o contador de notificações
+                        updateNotificationCount();
+                    }
+                });
+            });
+            
+            // Atualiza o contador de notificações
+            function updateNotificationCount() {
+                const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                const countElement = document.querySelector('.notification-count');
+                
+                countElement.textContent = unreadCount;
+                
+                // Se não houver notificações não lidas, desabilita o botão "Marcar todas como lidas"
+                if (unreadCount === 0) {
+                    markAllReadButton.disabled = true;
+                    markAllReadButton.style.opacity = '0.6';
+                    markAllReadButton.style.cursor = 'not-allowed';
+                }
+            }
+            
+            // Verifica se a lista de notificações está vazia
+            function checkEmptyNotifications() {
+                const notificationList = document.querySelector('.notification-list');
+                const remainingItems = notificationList.querySelectorAll('.notification-item').length;
+                
+                if (remainingItems === 0) {
+                    // Cria e adiciona o estado vazio
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'notification-empty';
+                    emptyState.innerHTML = `
+                        <div class="notification-empty-icon">
+                            <i class="fas fa-bell-slash"></i>
+                        </div>
+                        <div class="notification-empty-title">Nenhuma notificação</div>
+                        <div class="notification-empty-message">Você não tem notificações para exibir neste momento.</div>
+                    `;
+                    
+                    notificationList.appendChild(emptyState);
+                    
+                    // Esconde a paginação
+                    document.querySelector('.notification-pagination').style.display = 'none';
+                }
+            }
+            
+            // Navegação de paginação
+            const pageButtons = document.querySelectorAll('.page-button');
+            
+            pageButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove a classe active de todos os botões
+                    pageButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Adiciona a classe active ao botão clicado se não for botão de navegação
+                    if (!this.querySelector('.fa-chevron-left') && !this.querySelector('.fa-chevron-right')) {
+                        this.classList.add('active');
+                    }
+                    
+                    // Aqui você implementaria a lógica para mostrar a página correspondente
+                });
+            });
+        });
+    </script>
+</body>
+</html>

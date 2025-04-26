@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vídeo Aulas | Sistema Educacional</title>
+    <style>
+        :root {
+            --primary-color: #ff9500;
+            --primary-light: #ffbb33;
+            --primary-dark: #ff6d00;
+            --secondary-color: #ffcc80;
+            --text-color: #333;
+            --text-light: #6b7280;
+            --bg-color: #fff;
+            --bg-secondary: #fffaf0;
+            --border-color: #ffe0b2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(255, 149, 0, 0.1), 0 4px 6px -2px rgba(255, 149, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #ffcc80 0%, #ff9500 100%);
+            --gradient-secondary: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            --animation-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8e1 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all var(--animation-speed);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Tabs Styles */
+        .tabs {
+            display: flex;
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all var(--animation-speed);
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0;
+            transition: opacity var(--animation-speed);
+            z-index: -1;
+        }
+
+        .tab:hover:before {
+            opacity: 0.5;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab.active:before {
+            opacity: 1;
+        }
+
+        /* Video Grid */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .video-card {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 149, 0, 0.15);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .video-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 149, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .video-play-button:hover {
+            background-color: var(--primary-color);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .video-body {
+            padding: 1.25rem;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 2.8rem;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .video-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .video-meta-item i {
+            color: var(--primary-color);
+        }
+
+        .video-description {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .video-tag {
+            background-color: var(--bg-secondary);
+            color: var(--primary-dark);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .video-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.875rem;
+        }
+
+        .video-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Filters */
+        .filters-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filters-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filters-body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            background-color: white;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        .search-box i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+
+        /* Button styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        /* Video Player Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .video-player-modal {
+            width: 90%;
+            max-width: 1000px;
+            background-color: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .video-player-modal {
+            transform: scale(1);
+        }
+
+        .video-player-container {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+
+        .video-player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal-btn:hover {
+            background-color: rgba(255, 149, 0, 0.8);
+            transform: rotate(90deg);
+        }
+
+        /* Floating action button */
+        .floating-action-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: none;
+        }
+
+        .floating-action-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.4);
+        }
+
+        /* Upload video modal */
+        .upload-modal-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateY(50px) scale(0.95);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-overlay.active .upload-modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .upload-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gradient-secondary);
+        }
+
+        .upload-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .upload-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .upload-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background-color: var(--bg-secondary);
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .file-upload-container {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--bg-secondary);
+            color: var(--text-light);
+        }
+
+        .file-upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .filters-body {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-group, .search-box {
+                width: 100%;
+            }
+
+            .video-player-modal {
+                width: 95%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .tab.active {
+                border-bottom: 1px solid var(--primary-color);
+            }
+        }
+
+        /* Background elements */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .circle-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.7;
+            filter: blur(40px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos decorativos de fundo -->
+    <div class="background-elements">
+        <div class="circle-element" style="top: 20%; left: 5%; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(255, 236, 179, 0.3) 0%, rgba(255, 167, 38, 0.3) 100%);"></div>
+        <div class="circle-element" style="top: 60%; right: 8%; width: 250px; height: 250px; background: linear-gradient(135deg, rgba(255, 204, 128, 0.3) 0%, rgba(255, 149, 0, 0.3) 100%);"></div>
+        <div class="circle-element" style="bottom: 10%; left: 15%; width: 200px; height: 200px; background: linear-gradient(135deg, rgba(255, 167, 38, 0.3) 0%, rgba(255, 109, 0, 0.3) 100%);"></div>
+    </div>
+
+    <header>
+        <div class="header-title">
+            <h1><i class="fas fa-video"></i> Vídeo Aulas</h1>
+        </div>
+        <div class="header-actions">
+            <a href="dashboard-admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <div class="tab active" data-tab="todos">Todos os Vídeos</div>
+            <div class="tab" data-tab="programacao">Programação Web</div>
+            <div class="tab" data-tab="calculo">Cálculo I</div>
+            <div class="tab" data-tab="fisica">Física Moderna</div>
+            <div class="tab" data-tab="banco">Banco de Dados</div>
+        </div>
+
+        <div class="filters-container">
+            <div class="filters-header">
+                <h3 class="filters-title"><i class="fas fa-filter"></i> Filtros</h3>
+            </div>
+            <div class="filters-body">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchVideos" placeholder="Pesquisar vídeos...">
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Ordenar por:</span>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="recent">Mais recentes</option>
+                        <option value="popular">Mais visualizados</option>
+                        <option value="az">A-Z</option>
+                        <option value="za">Z-A</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Duração:</span>
+                    <select class="filter-select" id="durationFilter">
+                        <option value="all">Todas</option>
+                        <option value="short">Curta (< 5 min)</option>
+                        <option value="medium">Média (5-15 min)</option>
+                        <option value="long">Longa (> 15 min)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Nível:</span>
+                    <select class="filter-select" id="levelFilter">
+                        <option value="all">Todos</option>
+                        <option value="basic">Básico</option>
+                        <option value="intermediate">Intermediário</option>
+                        <option value="advanced">Avançado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="videos-grid">
+            <!-- Vídeo 1 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/epDCjksKMok/maxresdefault.jpg" alt="Introdução ao HTML e CSS">
+                    <div class="video-play-button" data-video-id="epDCjksKMok">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">15:42</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Introdução ao HTML e CSS: Fundamentos da Web</h3>
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>15/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>342 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Aprenda os conceitos básicos de HTML e CSS para criar estruturas e estilizar páginas web. Nesta aula, vamos abordar tags HTML, seletores CSS e o modelo de caixa.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Programação Web</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo 2 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/C72WkcUZvco/maxresdefault.jpg" alt="Layout Responsivo com CSS">
+                    <div class="video-play-button" data-video-id="C72WkcUZvco">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">18:26</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Layout Responsivo com CSS: Media Queries e Flexbox</h3>
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>22/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>287 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Aprenda a criar layouts que se adaptam a diferentes dispositivos usando Media Queries e Flexbox. Entenda como trabalhar com telas de diferentes tamanhos.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Programação Web</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo 3 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/BXqUH86F-kA/maxresdefault.jpg" alt="Introdução ao JavaScript">
+                    <div class="video-play-button" data-video-id="BXqUH86F-kA">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">22:14</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Introdução ao JavaScript: Variáveis, Tipos e Estruturas</h3>
+                    Continuando a criação do arquivo video-aulas.html:
+
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>29/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>241 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Conheça os fundamentos da linguagem JavaScript, incluindo variáveis, tipos de dados, operadores e estruturas de controle para criar interatividade em páginas web.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Programação Web</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo 4 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/mZqxmFC8QBA/maxresdefault.jpg" alt="Limites e Derivadas">
+                    <div class="video-play-button" data-video-id="mZqxmFC8QBA">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">28:35</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Limites e Derivadas: Conceitos Fundamentais</h3>
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>10/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>187 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Compreenda os conceitos de limites e derivadas no cálculo diferencial, incluindo definições, propriedades e aplicações práticas na resolução de problemas.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Cálculo I</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo 5 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/8a-3oA_Ry_w/maxresdefault.jpg" alt="Mecânica Quântica">
+                    <div class="video-play-button" data-video-id="8a-3oA_Ry_w">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">32:18</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Introdução à Mecânica Quântica: Princípios Fundamentais</h3>
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>05/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>164 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Explore os conceitos básicos da mecânica quântica, incluindo dualidade onda-partícula, princípio da incerteza e a equação de Schrödinger.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Física Moderna</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo 6 -->
+            <div class="video-card">
+                <div class="video-thumbnail">
+                    <img src="https://img.youtube.com/vi/HXV3zeQKqGY/maxresdefault.jpg" alt="Modelagem de Dados">
+                    <div class="video-play-button" data-video-id="HXV3zeQKqGY">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="video-duration">25:47</div>
+                </div>
+                <div class="video-body">
+                    <h3 class="video-title">Modelagem de Banco de Dados: Conceitos e Prática</h3>
+                    <div class="video-meta">
+                        <div class="video-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>18/06/2024</span>
+                        </div>
+                        <div class="video-meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>129 visualizações</span>
+                        </div>
+                    </div>
+                    <p class="video-description">Aprenda a projetar modelos de dados eficientes, entendendo conceitos como entidade-relacionamento, normalização e implementação em sistemas gerenciadores de banco de dados.</p>
+                    <div class="video-footer">
+                        <div class="video-tag">Banco de Dados</div>
+                        <div class="video-actions">
+                            <button class="video-action-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Materiais</span>
+                            </button>
+                            <button class="video-action-btn">
+                                <i class="fas fa-bookmark"></i>
+                                <span>Salvar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para reprodução de vídeo -->
+    <div class="modal-overlay" id="videoPlayerModal">
+        <div class="video-player-modal">
+            <button class="close-modal-btn" id="closeVideoModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="video-player-container">
+                <iframe id="videoIframe" src="" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para upload de vídeo -->
+    <div class="modal-overlay" id="uploadVideoModal">
+        <div class="upload-modal-container">
+            <div class="upload-modal-header">
+                <h3 class="upload-modal-title">Adicionar Nova Vídeo Aula</h3>
+                <button class="modal-close" id="closeUploadModal">&times;</button>
+            </div>
+            <div class="upload-modal-body">
+                <form id="uploadVideoForm">
+                    <div class="form-group">
+                        <label for="videoTitle" class="form-label">Título do Vídeo</label>
+                        <input type="text" id="videoTitle" class="form-input" placeholder="Ex: Introdução ao HTML e CSS">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoDescription" class="form-label">Descrição</label>
+                        <textarea id="videoDescription" class="form-textarea" placeholder="Descreva o conteúdo do vídeo..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoCadeira" class="form-label">Cadeira</label>
+                        <select id="videoCadeira" class="form-select">
+                            <option value="">Selecione uma cadeira</option>
+                            <option value="web">Programação Web</option>
+                            <option value="calc">Cálculo I</option>
+                            <option value="fisica">Física Moderna</option>
+                            <option value="bd">Banco de Dados</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Link do YouTube</label>
+                        <input type="text" id="videoYouTubeLink" class="form-input" placeholder="Ex: https://www.youtube.com/watch?v=abcdefg">
+                        <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">
+                            Insira o link do vídeo do YouTube que deseja incorporar
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">OU Carregar arquivo de vídeo</label>
+                        <div class="file-upload-container" id="fileUploadContainer">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="file-upload-text">Arraste e solte um arquivo ou clique para selecionar</div>
+                            <div class="file-upload-hint">Formatos suportados: MP4, WebM, MOV (máx. 500MB)</div>
+                            <input type="file" id="videoFile" class="file-upload-input" accept="video/*">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoDuration" class="form-label">Duração (minutos)</label>
+                        <input type="number" id="videoDuration" class="form-input" min="1" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoLevel" class="form-label">Nível</label>
+                        <select id="videoLevel" class="form-select">
+                            <option value="basic">Básico</option>
+                            <option value="intermediate">Intermediário</option>
+                            <option value="advanced">Avançado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoTags" class="form-label">Tags (separadas por vírgula)</label>
+                        <input type="text" id="videoTags" class="form-input" placeholder="Ex: html, css, web design">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Materiais Complementares</label>
+                        <div class="file-upload-container" id="materialsUploadContainer" style="padding: 1rem;">
+                            <div class="file-upload-text">Clique para adicionar materiais de apoio</div>
+                            <div class="file-upload-hint">Arquivos PDF, DOCX, PPTX (máx. 50MB)</div>
+                            <input type="file" id="videoMaterials" class="file-upload-input" accept=".pdf,.docx,.pptx">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="upload-modal-footer">
+                <button class="btn btn-secondary" id="cancelUploadBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveVideoBtn">Publicar Vídeo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão flutuante para adicionar vídeo -->
+    <button class="floating-action-btn" id="addVideoBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Controle de abas
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove a classe active de todas as abas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Adiciona a classe active na aba clicada
+                    this.classList.add('active');
+                    
+                    // Filtra os vídeos de acordo com a cadeira selecionada
+                    const tabId = this.getAttribute('data-tab');
+                    filterVideosByTab(tabId);
+                });
+            });
+            
+            // Filtro de vídeos por aba
+            function filterVideosByTab(tabId) {
+                const videoCards = document.querySelectorAll('.video-card');
+                
+                videoCards.forEach(card => {
+                    const videoTag = card.querySelector('.video-tag').textContent.toLowerCase();
+                    
+                    if (tabId === 'todos') {
+                        card.style.display = 'block';
+                    } else if (tabId === 'programacao' && videoTag.includes('programação')) {
+                        card.style.display = 'block';
+                    } else if (tabId === 'calculo' && videoTag.includes('cálculo')) {
+                        card.style.display = 'block';
+                    } else if (tabId === 'fisica' && videoTag.includes('física')) {
+                        card.style.display = 'block';
+                    } else if (tabId === 'banco' && videoTag.includes('banco')) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Pesquisa de vídeos
+            const searchInput = document.getElementById('searchVideos');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const videoCards = document.querySelectorAll('.video-card');
+                    
+                    videoCards.forEach(card => {
+                        const title = card.querySelector('.video-title').textContent.toLowerCase();
+                        const description = card.querySelector('.video-description').textContent.toLowerCase();
+                        const tag = card.querySelector('.video-tag').textContent.toLowerCase();
+                        
+                        if (title.includes(searchTerm) || description.includes(searchTerm) || tag.includes(searchTerm)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Ordenação de vídeos
+            const sortFilter = document.getElementById('sortFilter');
+            
+            if (sortFilter) {
+                sortFilter.addEventListener('change', function() {
+                    const sortValue = this.value;
+                    const videosGrid = document.querySelector('.videos-grid');
+                    const videoCards = Array.from(document.querySelectorAll('.video-card'));
+                    
+                    switch (sortValue) {
+                        case 'recent':
+                            // Ordena por data (mais recente primeiro)
+                            videoCards.sort((a, b) => {
+                                const dateA = new Date(a.querySelector('.video-meta-item:first-child span').textContent);
+                                const dateB = new Date(b.querySelector('.video-meta-item:first-child span').textContent);
+                                return dateB - dateA;
+                            });
+                            break;
+                        case 'popular':
+                            // Ordena por visualizações (maior primeiro)
+                            videoCards.sort((a, b) => {
+                                const viewsA = parseInt(a.querySelector('.video-meta-item:nth-child(2) span').textContent);
+                                const viewsB = parseInt(b.querySelector('.video-meta-item:nth-child(2) span').textContent);
+                                return viewsB - viewsA;
+                            });
+                            break;
+                        case 'az':
+                            // Ordena alfabeticamente (A-Z)
+                            videoCards.sort((a, b) => {
+                                const titleA = a.querySelector('.video-title').textContent;
+                                const titleB = b.querySelector('.video-title').textContent;
+                                return titleA.localeCompare(titleB);
+                            });
+                            break;
+                        case 'za':
+                            // Ordena alfabeticamente (Z-A)
+                            videoCards.sort((a, b) => {
+                                const titleA = a.querySelector('.video-title').textContent;
+                                const titleB = b.querySelector('.video-title').textContent;
+                                return titleB.localeCompare(titleA);
+                            });
+                            break;
+                    }
+                    
+                    // Limpa e readiciona os cartões ordenados
+                    videosGrid.innerHTML = '';
+                    videoCards.forEach(card => {
+                        videosGrid.appendChild(card);
+                    });
+                });
+            }
+            
+            // Filtro de duração
+            const durationFilter = document.getElementById('durationFilter');
+            
+            if (durationFilter) {
+                durationFilter.addEventListener('change', function() {
+                    const filterValue = this.value;
+                    const videoCards = document.querySelectorAll('.video-card');
+                    
+                    videoCards.forEach(card => {
+                        const durationText = card.querySelector('.video-duration').textContent;
+                        const durationParts = durationText.split(':');
+                        let durationMinutes = 0;
+                        
+                        if (durationParts.length === 2) {
+                            durationMinutes = parseInt(durationParts[0]);
+                        } else if (durationParts.length === 3) {
+                            durationMinutes = parseInt(durationParts[0]) * 60 + parseInt(durationParts[1]);
+                        }
+                        
+                        if (filterValue === 'all') {
+                            card.style.display = 'block';
+                        } else if (filterValue === 'short' && durationMinutes < 5) {
+                            card.style.display = 'block';
+                        } else if (filterValue === 'medium' && durationMinutes >= 5 && durationMinutes <= 15) {
+                            card.style.display = 'block';
+                        } else if (filterValue === 'long' && durationMinutes > 15) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Controle do modal de reprodução de vídeo
+            const videoPlayerModal = document.getElementById('videoPlayerModal');
+            const videoIframe = document.getElementById('videoIframe');
+            const closeVideoModal = document.getElementById('closeVideoModal');
+            const playButtons = document.querySelectorAll('.video-play-button');
+            
+            // Função para abrir o modal e reproduzir o vídeo
+            function openVideoModal(videoId) {
+                videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                videoPlayerModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Impede rolagem
+            }
+            
+            // Função para fechar o modal
+            function closeVideoModal() {
+                videoIframe.src = '';
+                videoPlayerModal.classList.remove('active');
+                document.body.style.overflow = ''; // Restaura rolagem
+            }
+            
+            // Eventos de clique para os botões de play
+            playButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const videoId = this.getAttribute('data-video-id');
+                    openVideoModal(videoId);
+                });
+            });
+            
+            // Evento para fechar o modal
+            if (closeVideoModal) {
+                closeVideoModal.addEventListener('click', closeVideoModal);
+            }
+            
+            // Fechar modal se clicar fora
+            window.addEventListener('click', function(e) {
+                if (e.target === videoPlayerModal) {
+                    closeVideoModal();
+                }
+            });
+            
+            // Controle do modal de upload de vídeo
+            const uploadVideoModal = document.getElementById('uploadVideoModal');
+            const addVideoBtn = document.getElementById('addVideoBtn');
+            const closeUploadModal = document.getElementById('closeUploadModal');
+            const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+            const saveVideoBtn = document.getElementById('saveVideoBtn');
+            
+            // Função para abrir o modal de upload
+            function openUploadModal() {
+                uploadVideoModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Impede rolagem
+            }
+            
+            // Função para fechar o modal de upload
+            function closeUploadModal() {
+                uploadVideoModal.classList.remove('active');
+                document.body.style.overflow = ''; // Restaura rolagem
+                document.getElementById('uploadVideoForm').reset();
+            }
+            
+            // Eventos para os botões
+            if (addVideoBtn) {
+                addVideoBtn.addEventListener('click', openUploadModal);
+            }
+            
+            if (closeUploadModal) {
+                closeUploadModal.addEventListener('click', closeUploadModal);
+            }
+            
+            if (cancelUploadBtn) {
+                cancelUploadBtn.addEventListener('click', closeUploadModal);
+            }
+            
+            // Lógica de upload de arquivo
+            const fileUploadContainer = document.getElementById('fileUploadContainer');
+            const videoFileInput = document.getElementById('videoFile');
+            
+            if (fileUploadContainer && videoFileInput) {
+                fileUploadContainer.addEventListener('click', function() {
+                    videoFileInput.click();
+                });
+                
+                fileUploadContainer.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = 'var(--primary-color)';
+                    this.style.backgroundColor = 'rgba(255, 149, 0, 0.05)';
+                });
+                
+                fileUploadContainer.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = 'var(--border-color)';
+                    this.style.backgroundColor = 'var(--bg-secondary)';
+                });
+                
+                fileUploadContainer.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = 'var(--border-color)';
+                    this.style.backgroundColor = 'var(--bg-secondary)';
+                    
+                    if (e.dataTransfer.files.length) {
+                        videoFileInput.files = e.dataTransfer.files;
+                        updateFileUploadPreview(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                videoFileInput.addEventListener('change', function() {
+                    if (this.files.length) {
+                        updateFileUploadPreview(this.files[0]);
+                    }
+                });
+                
+                function updateFileUploadPreview(file) {
+                    const fileUploadText = fileUploadContainer.querySelector('.file-upload-text');
+                    fileUploadText.textContent = file.name;
+                    fileUploadContainer.style.borderColor = 'var(--success-color)';
+                }
+            }
+            
+            // Upload de materiais complementares
+            const materialsUploadContainer = document.getElementById('materialsUploadContainer');
+            const videoMaterialsInput = document.getElementById('videoMaterials');
+            
+            if (materialsUploadContainer && videoMaterialsInput) {
+                materialsUploadContainer.addEventListener('click', function() {
+                    videoMaterialsInput.click();
+                });
+                
+                videoMaterialsInput.addEventListener('change', function() {
+                    if (this.files.length) {
+                        const materialsText = materialsUploadContainer.querySelector('.file-upload-text');
+                        materialsText.textContent = `${this.files.length} arquivo(s) selecionado(s)`;
+                        materialsUploadContainer.style.borderColor = 'var(--success-color)';
+                    }
+                });
+            }
+            
+            // Salvar vídeo
+            if (saveVideoBtn) {
+                saveVideoBtn.addEventListener('click', function() {
+                    // Aqui você implementaria a lógica de envio do formulário para o servidor
+                    // Por enquanto, só vamos simular o sucesso
+                    
+                    const title = document.getElementById('videoTitle').value;
+                    const description = document.getElementById('videoDescription').value;
+                    const cadeira = document.getElementById('videoCadeira').value;
+                    const youtubeLink = document.getElementById('videoYouTubeLink').value;
+                    
+                    if (!title || !description || !cadeira || (!youtubeLink && !document.getElementById('videoFile').files.length)) {
+                        alert('Por favor, preencha todos os campos obrigatórios (título, descrição, cadeira e vídeo).');
+                        return;
+                    }
+                    
+                    // Simulação de upload bem-sucedido
+                    closeUploadModal();
+                    
+                    // Adicionar novo vídeo à lista (simulação)
+                    addNewVideoCard({
+                        title: title,
+                        description: description,
+                        cadeira: getFullCadeiraName(cadeira),
+                        duration: document.getElementById('videoDuration').value + ':00',
+                        // Usando um ID de vídeo padrão para demonstração
+                        videoId: 'dQw4w9WgXcQ'
+                    });
+                    
+                    // Alerta de sucesso
+                    alert('Vídeo adicionado com sucesso!');
+                });
+            }
+            
+            // Função para obter o nome completo da cadeira
+            function getFullCadeiraName(code) {
+                const cadeiras = {
+                    'web': 'Programação Web',
+                    'calc': 'Cálculo I',
+                    'fisica': 'Física Moderna',
+                    'bd': 'Banco de Dados'
+                };
+                
+                return cadeiras[code] || code;
+            }
+            
+            // Função para adicionar um novo cartão de vídeo (simulação)
+            function addNewVideoCard(videoData) {
+                const videosGrid = document.querySelector('.videos-grid');
+                
+                const currentDate = new Date();
+                const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+                
+                const newVideoCard = document.createElement('div');
+                newVideoCard.className = 'video-card';
+                newVideoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/${videoData.videoId}/maxresdefault.jpg" alt="${videoData.title}">
+                        <div class="video-play-button" data-video-id="${videoData.videoId}">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">${videoData.duration}</div>
+                    </div>
+                    <div class="video-body">
+                        <h3 class="video-title">${videoData.title}</h3>
+                        <div class="video-meta">
+                            <div class="video-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <div class="video-meta-item">
+                                <i class="fas fa-eye"></i>
+                                <span>0 visualizações</span>
+                            </div>
+                        </div>
+                        <p class="video-description">${videoData.description}</p>
+                        <div class="video-footer">
+                            <div class="video-tag">${videoData.cadeira}</div>
+                            <div class="video-actions">
+                                <button class="video-action-btn">
+                                    <i class="fas fa-download"></i>
+                                    <span>Materiais</span>
+                                </button>
+                                <button class="video-action-btn">
+                                    <i class="fas fa-bookmark"></i>
+                                    <span>Salvar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Adicionar o novo cartão no início da grade
+                videosGrid.insertBefore(newVideoCard, videosGrid.firstChild);
+                
+                // Adicionar evento de clique no botão de play
+                const playButton = newVideoCard.querySelector('.video-play-button');
+                playButton.addEventListener('click', function() {
+                    const videoId = this.getAttribute('data-video-id');
+                    openVideoModal(videoId);
+                });
+            }
+
+            document.getElementById('videoLink').addEventListener('click', function() {
+                window.location.href = 'video-aulas.html';
+            });
+        });
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração do Sistema de Armazenamento - DJAMEC Portal Educacional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #f59e0b;
+            --primary-light: #fcd34d;
+            --primary-dark: #d97706;
+            --accent-color: #fb923c;
+            --accent-dark: #ea580c;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-white);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        header h1 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+        }
+        
+        header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .logo i {
+            color: var(--accent-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-links a:hover {
+            background-color: var(--primary-light);
+            color: var(--text-primary);
+        }
+        
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .content-section {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+        
+        .content-section h2 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 8px;
+        }
+        
+        .content-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        code {
+            background-color: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: var(--primary-dark);
+        }
+        
+        pre {
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        
+        .highlight {
+            background-color: #fff7ed;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .highlight h3 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        
+        #storage-demo-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .demo-message {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+            background-color: #f9fafb;
+        }
+        
+        .demo-message.success {
+            border-left-color: var(--success-color);
+            background-color: rgba(34, 197, 94, 0.05);
+        }
+        
+        .demo-message.error {
+            border-left-color: var(--danger-color);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+        
+        .demo-message h4 {
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .demo-message p {
+            margin-bottom: 0;
+            word-break: break-word;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .demo-button {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .demo-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .demo-button.clear {
+            background-color: var(--text-secondary);
+        }
+        
+        .demo-button.clear:hover {
+            background-color: var(--text-primary);
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 20px 0;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+    
+    <!-- Carrega o sistema de armazenamento de dados -->
+    <script src="data-storage.js"></script>
+    
+    <!-- Carrega o script de demonstração -->
+    <script src="storage-demo.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <span>DJAMEC</span>
+            </div>
+            <h1>Sistema de Armazenamento de Dados</h1>
+            <nav class="nav-links">
+                <a href="tela-login-new.html">Login</a>
+                <a href="dashboard-admin.html">Dashboard</a>
+                <a href="javascript:history.back()">Voltar</a>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="content-section">
+                <h2>Novo Sistema de Armazenamento</h2>
+                <p>
+                    O novo sistema de armazenamento de dados do Portal Educacional DJAMEC foi projetado para oferecer maior robustez, segurança e eficiência no gerenciamento de dados no navegador.
+                </p>
+                <p>
+                    Este sistema utiliza IndexedDB como mecanismo principal de armazenamento, com fallback para localStorage quando necessário, e incorpora recursos avançados como criptografia básica de dados sensíveis e estrutura organizada para diferentes tipos de dados.
+                </p>
+                
+                <div class="highlight">
+                    <h3>Principais Características</h3>
+                    <ul>
+                        <li>Armazenamento estruturado por tipo de dados (usuários, estudantes, cadeiras, etc.)</li>
+                        <li>Criptografia básica para dados sensíveis (senhas, documentos, telefones)</li>
+                        <li>Sistema de migração de versões do banco de dados</li>
+                        <li>Métodos de consulta eficientes para recuperação de dados</li>
+                        <li>Fallback automático para navegadores sem suporte a IndexedDB</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2>Como Utilizar</h2>
+                <p>A utilização do sistema é simples e organizada, oferecendo uma API intuitiva para interagir com os dados:</p>
+                
+                <pre><code>// Salvar dados
+await dataStorage.saveData('estudantes', {
+    id: 'est123',
+    nome: 'João Silva',
+    email: 'joao@exemplo.com'
+});
+
+// Recuperar dados
+const estudante = await dataStorage.getData('estudantes', 'est123');
+
+// Consultar dados por critério
+const turmaA = await dataStorage.queryData('estudantes', 'turma', 'A');
+
+// Salvar configurações
+await dataStorage.saveConfig('tema', 'escuro');
+
+// Gerenciar sessão
+dataStorage.saveSession(userData, true);
+const isAuthenticated = dataStorage.isAuthenticated();</code></pre>
+                
+                <p>
+                    O sistema oferece métodos específicos para cada necessidade, automatizando processos como geração de IDs, controle de timestamps de criação/atualização e criptografia de dados sensíveis.
+                </p>
+            </section>
+            
+            <section class="content-section">
+                <h2>Demonstração Interativa</h2>
+                <p>
+                    A seguir, você pode ver uma demonstração ao vivo das principais funcionalidades do sistema de armazenamento. O exemplo executa operações reais no banco de dados do navegador, mostrando o resultado de cada operação.
+                </p>
+                
+                <div id="storage-demo-container">
+                    <h3>Demonstração do Sistema de Armazenamento</h3>
+                    <!-- O conteúdo será preenchido dinamicamente pelo script storage-demo.js -->
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>© 2023 DJAMEC Portal Educacional. Sistema de Armazenamento de Dados v1.0</p>
+        </footer>
+    </div>
+</body>
+</html> 

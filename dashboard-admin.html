@@ -1,0 +1,3724 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - Portal Educacional</title>
+    
+    <!-- Incluir scripts de autenticação -->
+    <script src="auth.js"></script>
+    <script src="logout.js"></script>
+    
+    <script>
+        // Verificar autenticação
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar sistema de autenticação se ainda não estiver inicializado
+            if (!window.authSystem) {
+                window.authSystem = new AuthSystem();
+            }
+            
+            // Verificar se o usuário está autenticado usando o sistema principal
+            if (!window.authSystem.isAuthenticated()) {
+                // Redirecionar para a tela de login se não estiver autenticado
+                window.location.href = 'tela-login.html';
+                return;
+            }
+            
+            // Obter dados do usuário para mostrar no painel
+            const userData = window.authSystem.getCurrentUser();
+            
+            // Atualizar a interface com os dados do usuário
+            if (userData) {
+                updateUserInterface(userData);
+            }
+            
+            // Função para atualizar interface com dados do usuário
+            function updateUserInterface(userData) {
+                // Atualiza o nome e papel do usuário na sidebar
+                const sidebarUserName = document.getElementById('sidebar-user-name');
+                const sidebarUserRole = document.getElementById('sidebar-user-role');
+                const sidebarUserAvatar = document.getElementById('sidebar-user-avatar');
+                
+                if (sidebarUserName && userData.name) {
+                    sidebarUserName.textContent = userData.name;
+                } else if (sidebarUserName) {
+                    sidebarUserName.textContent = userData.username || 'Usuário';
+                }
+                
+                if (sidebarUserRole && userData.role) {
+                    sidebarUserRole.textContent = userData.role;
+                }
+                
+                if (sidebarUserAvatar && userData.name) {
+                    // Iniciais para o avatar
+                    const initials = userData.name
+                        .split(' ')
+                        .map(n => n[0])
+                        .slice(0, 2)
+                        .join('');
+                    
+                    sidebarUserAvatar.textContent = initials.toUpperCase();
+                }
+                
+                // Atualiza dados no topbar, se houver
+                const topbarUserName = document.getElementById('topbar-user-name');
+                const topbarUserRole = document.getElementById('topbar-user-role');
+                const topbarUserAvatar = document.getElementById('topbar-user-avatar');
+                
+                if (topbarUserName && userData.name) {
+                    topbarUserName.textContent = userData.name;
+                }
+                
+                if (topbarUserRole && userData.role) {
+                    topbarUserRole.textContent = userData.role;
+                }
+                
+                if (topbarUserAvatar && userData.name) {
+                    // Iniciais para o avatar
+                    const initials = userData.name
+                        .split(' ')
+                        .map(n => n[0])
+                        .slice(0, 2)
+                        .join('');
+                    
+                    topbarUserAvatar.textContent = initials.toUpperCase();
+                }
+                
+                // Atualiza o texto de boas-vindas
+                const welcomeUserName = document.getElementById('welcome-user-name');
+                if (welcomeUserName && userData.name) {
+                    const firstName = userData.name.split(' ')[0];
+                    welcomeUserName.textContent = firstName;
+                }
+            }
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #f59e0b;
+            --primary-light: #fcd34d;
+            --primary-dark: #d97706;
+            --accent-color: #fb923c;
+            --accent-dark: #ea580c;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-sidebar: #ffffff;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-primary);
+            height: 100vh;
+            transition: all 0.3s ease;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            overflow-y: auto; /* Corrigido: Permite rolagem quando o conteúdo é grande */
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logo i {
+            color: var(--accent-color);
+        }
+
+        .sidebar-close {
+            display: none;
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-menu {
+            padding: 1rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .menu-category {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.75rem 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--primary-color);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item .badge {
+            position: absolute;
+            right: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            position: relative; /* Alterado: não é mais position:absolute */
+            width: 100%;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            margin-top: 2rem; /* Espaço extra antes do footer */
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0; /* Impede compressão */
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: all 0.3s ease;
+            width: calc(100% - 280px); /* Largura calculada corretamente */
+            max-width: 100%; /* Garante que não haja overflow */
+        }
+
+        /* NOVA IMPLEMENTAÇÃO DOS ÍCONES SUPERIORES - INÍCIO */
+        .topbar {
+            background-color: white;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            width: 100%;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            display: none;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .search-bar {
+            margin-left: 1rem;
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 3rem;
+            border-radius: 25px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: var(--bg-light);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Ícones da barra superior */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            padding-left: 1rem;
+        }
+
+        .topbar-action {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .topbar-action i {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .topbar-action:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .topbar-action:hover i {
+            color: white;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            z-index: 1;
+        }
+
+        /* Tooltip para os ícones */
+        .topbar-action .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 100;
+            width: auto;
+            white-space: nowrap;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        .topbar-action .tooltip-text::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+        }
+
+        .topbar-action:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(5px);
+        }
+
+        /* Responsividade para a barra superior */
+        @media (max-width: 992px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .topbar {
+                padding: 0 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+            
+            .topbar-actions {
+                padding-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 0 1rem;
+            }
+            
+            .topbar-actions {
+                gap: 8px;
+            }
+            
+            .topbar-action {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                min-height: 38px;
+            }
+        }
+        /* NOVA IMPLEMENTAÇÃO DOS ÍCONES SUPERIORES - FIM */
+
+        /* Dashboard Content */
+        .dashboard {
+            padding: 2rem;
+        }
+
+        .dashboard-title {
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-icon {
+            min-width: 60px; /* Impede compressão */
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            flex-shrink: 0; /* Impede compressão */
+        }
+
+        .stat-courses { background-color: rgba(251, 146, 60, 0.1); color: var(--accent-color); }
+        .stat-students { background-color: rgba(245, 158, 11, 0.1); color: var(--primary-color); }
+        .stat-content { background-color: rgba(251, 191, 36, 0.1); color: var(--warning-color); }
+        .stat-engagement { background-color: rgba(245, 158, 11, 0.1); color: var(--primary-dark); }
+
+        .stat-details {
+            flex: 1;
+            min-width: 0; /* Permite que o flex item encolha */
+            overflow: hidden; /* Impede overflow */
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-change.positive { color: var(--success-color); }
+        .stat-change.negative { color: var(--danger-color); }
+
+        .stat-change i {
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column; /* Garante layout correto */
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .card-action {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden; /* Para o efeito ripple */
+        }
+
+        .card-action:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            overflow-y: auto; /* Permite rolagem */
+            flex: 1; /* Preenche espaço disponível */
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative; /* Para posicionamento correto do canvas */
+        }
+
+        .content-items {
+            margin-top: 1.5rem;
+        }
+
+        .content-list {
+            list-style-type: none;
+        }
+
+        .content-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            flex-wrap: wrap; /* Permite quebra em layouts menores */
+        }
+
+        .content-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background-color: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            flex-shrink: 0; /* Impede compressão */
+        }
+
+        .content-icon.video { color: var(--accent-color); }
+        .content-icon.document { color: var(--primary-color); }
+        .content-icon.quiz { color: var(--warning-color); }
+
+        .content-details {
+            flex: 1;
+            min-width: 0; /* Permite que o flex item encolha */
+            padding-right: 1rem; /* Espaço para o status */
+        }
+
+        .content-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .content-meta {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* Permite quebra em layouts menores */
+            gap: 0.5rem; /* Espaçamento entre itens */
+        }
+
+        .content-meta i {
+            margin-right: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .content-meta span {
+            white-space: nowrap; /* Mantém itens agrupados */
+        }
+
+        .content-status {
+            flex-shrink: 0; /* Impede compressão */
+            display: flex;
+            align-items: center;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-draft {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--primary-color);
+        }
+
+        .status-review {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--info-color);
+        }
+
+        .activity-list {
+            list-style-type: none;
+        }
+
+        .activity-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            flex-shrink: 0; /* Impede compressão */
+        }
+
+        .activity-student { background-color: rgba(245, 158, 11, 0.1); color: var(--primary-color); }
+        .activity-content { background-color: rgba(251, 146, 60, 0.1); color: var(--accent-color); }
+        .activity-comment { background-color: rgba(251, 191, 36, 0.1); color: var(--warning-color); }
+
+        .activity-details {
+            flex: 1;
+            min-width: 0; /* Permite que o flex item encolha */
+        }
+
+        .activity-text {
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+            border: none;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .fab i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .fab .tooltip-text {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .fab .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+        .fab:hover .tooltip-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Efeitio Ripple específico para o FAB */
+        .fab .ripple {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--primary-color);
+            font-size: 0.8rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -280px;
+                box-shadow: none;
+            }
+            
+            .sidebar.open {
+                left: 0;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .sidebar-close {
+                display: block;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                display: none;
+            }
+            
+            .dashboard {
+                padding: 1.5rem 1rem;
+            }
+            
+            .content-meta {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .content-item {
+                flex-wrap: wrap;
+            }
+            
+            .content-status {
+                margin-top: 0.5rem;
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 0 1rem;
+            }
+            
+            .topbar-actions {
+                gap: 0.8rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1.25rem;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card, .card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(30, 41, 59, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 8px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            pointer-events: none; /* Evita problemas de hover */
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(30, 41, 59, 0.9) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+        
+        /* Efeito de ripple nos botões */
+        .ripple {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+            
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Novos estilos para gestão de aulas */
+        
+        /* Modal para upload de conteúdo */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Formulário para upload de conteúdo */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(245, 158, 11, 0.05);
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-text {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .file-preview {
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .file-preview.active {
+            display: block;
+        }
+        
+        .file-name {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+        }
+        
+        .file-name i {
+            margin-right: 0.5rem;
+            color: var(--accent-color);
+        }
+        
+        .file-name span {
+            flex: 1;
+        }
+        
+        .file-name button {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+        }
+        
+        /* Botões */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        /* Gerenciador de questionário */
+        .question-list {
+            margin-top: 1rem;
+        }
+        
+        .question-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .question-actions button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .question-actions button:hover {
+            color: var(--primary-color);
+        }
+        
+        .question-title {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .option-list {
+            list-style-type: none;
+            margin-top: 0.5rem;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        
+        .add-option-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .add-option-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .add-question-btn {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--primary-color);
+            border: 1px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-question-btn:hover {
+            background-color: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Visualizador de aulas */
+        .lesson-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .lesson-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .lesson-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .lesson-meta span {
+            margin-right: 1rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .lesson-meta i {
+            margin-right: 0.5rem;
+        }
+        
+        .video-container {
+            width: 100%;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            padding-top: 56.25%; /* 16:9 aspect ratio */
+        }
+        
+        .video-container video,
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .content-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+        
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .lesson-content {
+            line-height: 1.7;
+        }
+        
+        .lesson-content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .lesson-content p {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .lesson-content ul, 
+        .lesson-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Quiz interface */
+        .quiz-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .quiz-description {
+            color: var(--text-secondary);
+        }
+        
+        .quiz-question {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-number {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-options {
+            list-style-type: none;
+        }
+        
+        .quiz-option {
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quiz-option:hover {
+            background-color: rgba(245, 158, 11, 0.05);
+            border-color: var(--primary-color);
+        }
+        
+        .quiz-option.selected {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .quiz-option input {
+            margin-right: 1rem;
+        }
+        
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        /* Cadeiras e disciplinas */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .subject-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .subject-banner {
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .subject-content {
+            padding: 1.5rem;
+        }
+        
+        .subject-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .subject-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .subject-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .subject-lessons {
+            display: flex;
+            align-items: center;
+        }
+        
+        .subject-lessons i {
+            margin-right: 0.25rem;
+            color: var(--primary-color);
+        }
+
+        /* ESTILO DO BOTÃO FLUTUANTE COMPLETAMENTE REFEITO */
+        .action-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #f59e0b;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            outline: none;
+            padding: 0;
+        }
+        
+        .action-button:hover {
+            background-color: #ea580c;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .action-button:active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-button-icon {
+            font-size: 24px;
+            line-height: 1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-button-tooltip {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1e293b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-button-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        
+        .action-button:hover .action-button-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .action-button {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .action-button-icon {
+                font-size: 20px;
+            }
+        }
+
+        /* Correção específica para o botão Video aulas */
+        #videoLink {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            color: var(--text-light);
+        }
+
+        #videoLink:hover {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Dropdown de notificações */
+        .notifications-dropdown {
+            position: absolute;
+            top: 55px;
+            right: -10px;
+            width: 320px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            overflow: hidden;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .topbar-action {
+            position: relative;
+        }
+
+        /* Ajuste para posicionar o dropdown corretamente */
+        #notificationToggle .notifications-dropdown {
+            position: absolute;
+            top: 50px;
+            right: -140px; /* Centraliza melhor o dropdown */
+            z-index: 1000; /* Garante que fique acima de outros elementos */
+        }
+
+        .notifications-dropdown.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notifications-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .notifications-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notifications-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .notification-item-preview {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .notification-item-preview:hover {
+            background-color: var(--bg-light);
+        }
+
+        .notification-item-preview.unread {
+            background-color: rgba(245, 158, 11, 0.05);
+            position: relative;
+        }
+
+        .notification-item-preview.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: var(--accent-color);
+        }
+
+        .notification-icon-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-light);
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .notification-content-preview {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title-preview {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notification-message-preview {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .notification-time-preview {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .notifications-footer {
+            padding: 12px 15px;
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .view-all-btn {
+            color: var(--accent-color);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .view-all-btn:hover {
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsividade para a barra superior */
+        @media (max-width: 992px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .topbar {
+                padding: 0 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+            
+            .topbar-actions {
+                padding-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 0 1rem;
+            }
+            
+            .topbar-actions {
+                gap: 0.8rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1.25rem;
+            }
+        }
+
+        /* Dropdown de Perfil do Usuário */
+        .user-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            width: 280px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-dropdown-header .user-avatar {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+        }
+        
+        .user-dropdown-menu {
+            padding: 0.5rem 0;
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.7rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .user-dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.05);
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="logo.png" alt="DJAMEC Logo" style="height: 40px; margin-right: 10px;">
+                Djamec-ADMIN
+            </div>
+            <div class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-category">Principal</div>
+            <div class="menu-item active" id="dashboardLink">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item" id="subjectsLink" onclick="window.location.href='gerenciar-cadeiras.html'">
+                <i class="fas fa-book"></i>
+                <span>Cadeiras</span>
+            </div>
+            <div class="menu-item" id="videoLink" onclick="window.location.href='video-aulas.html'">
+                <i class="fas fa-video"></i>
+                <span>Video aulas</span>
+                <div class="badge">Novo</div>
+            </div>
+            
+            <div class="menu-category">Gerenciar</div>
+            <div class="menu-item" id="studentsLink" onclick="window.location.href='estudantes.html'">
+                <i class="fas fa-users"></i>
+                <span>Estudantes</span>
+            </div>
+            <div class="menu-item" id="materialsLink" onclick="window.location.href='materiais.html'">
+                <i class="fas fa-folder"></i>
+                <span>Materiais</span>
+            </div>
+            <div class="menu-item" id="quizLink" onclick="window.location.href='Questionários.html'">
+                <i class="fas fa-question-circle"></i>
+                <span>Questionários</span>
+            </div>
+            
+            <div class="menu-category">Sistema</div>
+            <div class="menu-item" id="settingsLink" onclick="window.location.href='configurações.html'">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+            </div>
+            <div class="menu-item" id="notificationsLink" onclick="window.location.href='notificações.html'">
+                <i class="fas fa-bell"></i>
+                <span>Notificações</span>
+                <div class="badge">12</div>
+            </div>
+            <div class="menu-item" id="logoutBtn" onclick="fazerLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div id="sidebar-user-avatar" class="user-avatar">
+                    <img src="logo.png" alt="DJAMEC Logo" style="height: 30px; width: 30px; object-fit: contain;">
+                </div>
+                <div class="user-details">
+                    <div id="sidebar-user-name" class="user-name">Darcio Calei</div>
+                    <div id="sidebar-user-role" class="user-role">Administrador</div>
+                </div>
+            </div>
+            <button id="logoutBtn" class="logout-button" title="Sair">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="topbar">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Pesquisar conteúdos, estudantes...">
+                <i class="fas fa-search"></i>
+            </div>
+            
+            <div class="topbar-actions">
+                <div class="topbar-action" id="addContentAction">
+                    <i class="fas fa-plus"></i>
+                    <div class="tooltip-text">Adicionar conteúdo</div>
+                </div>
+                <div class="topbar-action" id="notificationToggle">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">12</div>
+                    <div class="tooltip-text">Notificações</div>
+                    
+                    <!-- Dropdown de Notificações -->
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <div class="notifications-header">
+                            <div class="notifications-title">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificações</span>
+                            </div>
+                            <div class="notifications-count">12 novas</div>
+                        </div>
+                        <div class="notifications-list">
+                            <div class="notification-item-preview unread">
+                                <div class="notification-icon-preview">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="notification-content-preview">
+                                    <div class="notification-title-preview">Nova apostila disponível</div>
+                                    <div class="notification-message-preview">A apostila "Matemática Avançada para Ensino Médio" foi disponibilizada para download.</div>
+                                    <div class="notification-time-preview">Há 25 minutos</div>
+                                </div>
+                            </div>
+                            <div class="notification-item-preview unread">
+                                <div class="notification-icon-preview">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="notification-content-preview">
+                                    <div class="notification-title-preview">Atividade avaliada</div>
+                                    <div class="notification-message-preview">Sua atividade "Projeto de Ciências" foi avaliada pelo professor. Você recebeu nota 9.5.</div>
+                                    <div class="notification-time-preview">Há 1 hora</div>
+                                </div>
+                            </div>
+                            <div class="notification-item-preview unread">
+                                <div class="notification-icon-preview">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="notification-content-preview">
+                                    <div class="notification-title-preview">Prazo de entrega se aproximando</div>
+                                    <div class="notification-message-preview">O prazo para entrega da atividade "Redação: Meio Ambiente" vence amanhã às 23:59.</div>
+                                    <div class="notification-time-preview">Há 3 horas</div>
+                                </div>
+                            </div>
+                            <div class="notification-item-preview">
+                                <div class="notification-icon-preview">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="notification-content-preview">
+                                    <div class="notification-title-preview">Novo evento no calendário</div>
+                                    <div class="notification-message-preview">Foi adicionado um novo evento no calendário: "Feira de Ciências" para o dia 15/10/2023.</div>
+                                    <div class="notification-time-preview">Há 1 dia</div>
+                                </div>
+                            </div>
+                            <div class="notification-item-preview">
+                                <div class="notification-icon-preview">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="notification-content-preview">
+                                    <div class="notification-title-preview">Anúncio da direção</div>
+                                    <div class="notification-message-preview">A diretoria informa que a reunião de pais e mestres foi reagendada para o dia 25/10/2023 às 19h.</div>
+                                    <div class="notification-time-preview">Há 4 dias</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-footer">
+                            <a href="notificações.html" class="view-all-btn">Ver todas as notificações</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="topbar-action">
+                    <i class="fas fa-envelope"></i>
+                    <div class="notification-badge">5</div>
+                    <div class="tooltip-text">Mensagens</div>
+                </div>
+                <div class="topbar-action" id="userProfileAction">
+                    <img src="logo.png" alt="DJAMEC Logo" style="height: 25px; width: 25px; object-fit: contain;">
+                    <div class="tooltip-text">Perfil</div>
+                    
+                    <!-- Dropdown de Perfil do Usuário -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div id="topbar-user-avatar" class="user-avatar">
+                                <img src="logo.png" alt="DJAMEC Logo" style="height: 30px; width: 30px; object-fit: contain;">
+                            </div>
+                            <div>
+                                <div id="topbar-user-name" class="user-name">Darcio Calei</div>
+                                <div id="topbar-user-role" class="user-role">Administrador</div>
+                            </div>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <a href="#" class="user-dropdown-item">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                            <a href="configurações.html" class="user-dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Configurações</span>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="user-dropdown-item" id="topbarLogoutBtn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Section -->
+        <div class="dashboard" id="dashboardSection">
+            <h1 class="dashboard-title">Dashboard Educacional</h1>
+            <p class="dashboard-subtitle">Bem-vindo de volta, <span id="welcome-user-name">Darcio Calei</span>! Aqui está o desempenho do seu portal educativo.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-courses">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Cadeiras Ativas</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 2 novas este mês
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon stat-students">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">1.874</div>
+                        <div class="stat-label">Estudantes Ativos</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 12,5% desde o mês passado
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon stat-content">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">46</div>
+                        <div class="stat-label">Videoaulas Publicadas</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 5 novas este mês
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon stat-engagement">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">92%</div>
+                        <div class="stat-label">Taxa de Engajamento</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 5,3% desde o mês passado
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Atividade de Estudantes</div>
+                        <div class="card-actions">
+                            <div class="card-action tooltip">
+                                <i class="fas fa-redo"></i>
+                                <div class="tooltip-text">Atualizar dados</div>
+                            </div>
+                            <div class="card-action tooltip">
+                                <i class="fas fa-ellipsis-v"></i>
+                                <div class="tooltip-text">Mais opções</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="estudantesChart"></canvas>
+                        </div>
+                        
+                        <div class="content-items">
+                            <h3>Videoaulas Populares</h3>
+                            <ul class="content-list">
+                                <li class="content-item">
+                                    <div class="content-icon video">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Introdução à Programação Web</div>
+                                        <div class="content-meta">
+                                            <i class="fas fa-eye"></i><span>1.243 visualizações</span>
+                                            <i class="fas fa-thumbs-up"></i><span>128 curtidas</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-active">Ativo</span>
+                                    </div>
+                                </li>
+                                <li class="content-item">
+                                    <div class="content-icon video">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Cálculo Diferencial - Funções e Limites</div>
+                                        <div class="content-meta">
+                                            <i class="fas fa-eye"></i><span>876 visualizações</span>
+                                            <i class="fas fa-thumbs-up"></i><span>92 curtidas</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-active">Ativo</span>
+                                    </div>
+                                </li>
+                                <li class="content-item">
+                                    <div class="content-icon document">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Material de Física Quântica</div>
+                                        <div class="content-meta">
+                                            <i class="fas fa-download"></i><span>547 downloads</span>
+                                            <i class="fas fa-star"></i><span>4.8 avaliação</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-active">Ativo</span>
+                                    </div>
+                                </li>
+                                <li class="content-item">
+                                    <div class="content-icon video">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Física Moderna - Introdução</div>
+                                        <div class="content-meta">
+                                            <i class="fas fa-eye"></i><span>732 visualizações</span>
+                                            <i class="fas fa-thumbs-up"></i><span>94 curtidas</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-draft">Rascunho</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Atividades Recentes</div>
+                            <div class="card-actions">
+                                <div class="card-action tooltip">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                    <div class="tooltip-text">Mais opções</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <ul class="activity-list">
+                                <li class="activity-item">
+                                    <div class="activity-icon activity-student">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">
+                                            <strong>Ana Silva</strong> concluiu o questionário "Programação Java"
+                                        </div>
+                                        <div class="activity-time">há 20 minutos</div>
+                                    </div>
+                                </li>
+                                <li class="activity-item">
+                                    <div class="activity-icon activity-content">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">
+                                            Nova videoaula <strong>"Fundamentos de Banco de Dados"</strong> foi publicada
+                                        </div>
+                                        <div class="activity-time">há 45 minutos</div>
+                                    </div>
+                                </li>
+                                <li class="activity-item">
+                                    <div class="activity-icon activity-comment">
+                                        <i class="fas fa-comment"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">
+                                            <strong>Pedro Oliveira</strong> comentou na aula "Matemática Básica"
+                                        </div>
+                                        <div class="activity-time">há 1 hora</div>
+                                    </div>
+                                </li>
+                                <li class="activity-item">
+                                    <div class="activity-icon activity-student">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">
+                                            <strong>Carla Santos</strong> inscreveu-se na cadeira "Inglês Técnico"
+                                        </div>
+                                        <div class="activity-time">há 2 horas</div>
+                                    </div>
+                                </li>
+                                <li class="activity-item">
+                                    <div class="activity-icon activity-content">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-text">
+                                            <strong>Você</strong> atualizou o material "Geometria Analítica"
+                                        </div>
+                                        <div class="activity-time">há 3 horas</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <div class="card-header">
+                            <div class="card-title">Conteúdos Pendentes</div>
+                            <div class="card-actions">
+                                <div class="card-action tooltip">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                    <div class="tooltip-text">Mais opções</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <ul class="content-list">
+                                <li class="content-item">
+                                    <div class="content-icon video">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Gramática Avançada - Videoaula</div>
+                                        <div class="tags">
+                                            <span class="tag">Português</span>
+                                            <span class="tag">Linguística</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-draft">Rascunho</span>
+                                    </div>
+                                </li>
+                                <li class="content-item">
+                                    <div class="content-icon video">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Física Quântica - Parte 2</div>
+                                        <div class="tags">
+                                            <span class="tag">Física</span>
+                                            <span class="tag">Avançado</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-review">Em revisão</span>
+                                    </div>
+                                </li>
+                                <li class="content-item">
+                                    <div class="content-icon quiz">
+                                        <i class="fas fa-question-circle"></i>
+                                    </div>
+                                    <div class="content-details">
+                                        <div class="content-title">Questionário de Literatura</div>
+                                        <div class="tags">
+                                            <span class="tag">Literatura</span>
+                                            <span class="tag">Avaliação</span>
+                                        </div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-draft">Rascunho</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cadeiras/Disciplinas Section -->
+        <div class="dashboard" id="subjectsSection" style="display: none;">
+            <h1 class="dashboard-title">Cadeiras</h1>
+            <p class="dashboard-subtitle">Gerencie as cadeiras e suas videoaulas.</p>
+            
+            <div class="subjects-grid">
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Programação Web</h3>
+                        <p class="subject-description">Aprenda a desenvolver sites e aplicações web utilizando HTML, CSS, JavaScript e frameworks modernos.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 8 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 5 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Cálculo I</h3>
+                        <p class="subject-description">Fundamentos de cálculo diferencial e integral, limites, derivadas e integrais.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 12 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 8 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Física Moderna</h3>
+                        <p class="subject-description">Introdução à física moderna, teoria da relatividade e mecânica quântica.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 10 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 6 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Banco de Dados</h3>
+                        <p class="subject-description">Fundamentos de banco de dados, modelagem de dados, SQL e sistemas de gerenciamento.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 6 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 4 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Inglês Técnico</h3>
+                        <p class="subject-description">Desenvolvimento de habilidades de leitura e escrita em inglês para contextos técnicos e acadêmicos.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 5 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 3 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="subject-banner">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="subject-content">
+                        <h3 class="subject-title">Redes de Computadores</h3>
+                        <p class="subject-description">Fundamentos de redes, protocolos de comunicação, topologias e segurança de redes.</p>
+                        <div class="subject-meta">
+                            <div class="subject-lessons">
+                                <i class="fas fa-video"></i> 8 aulas
+                            </div>
+                            <div class="subject-lessons">
+                                <i class="fas fa-question-circle"></i> 5 questionários
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subject-card add-subject-card" id="addSubjectBtn" style="cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-plus-circle" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--primary-color);">Adicionar Nova Cadeira</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Videoaulas Section -->
+        <div class="dashboard" id="videoSection" style="display: none;">
+            <h1 class="dashboard-title">Videoaulas</h1>
+            <p class="dashboard-subtitle">Gerencie todas as suas videoaulas organizadas por cadeiras.</p>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Lista de Videoaulas</div>
+                    <div class="card-actions">
+                        <div class="card-action tooltip" id="addVideoBtn">
+                            <i class="fas fa-plus"></i>
+                            <div class="tooltip-text">Adicionar videoaula</div>
+                        </div>
+                        <div class="card-action tooltip">
+                            <i class="fas fa-filter"></i>
+                            <div class="tooltip-text">Filtrar</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <ul class="content-list">
+                        <li class="content-item">
+                            <div class="content-icon video">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Introdução à Programação Web</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Programação Web</span>
+                                    <span><i class="fas fa-clock"></i> 45 minutos</span>
+                                    <span><i class="fas fa-eye"></i> 1.243 visualizações</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon video">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">HTML Básico - Estrutura de Documentos</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Programação Web</span>
+                                    <span><i class="fas fa-clock"></i> 38 minutos</span>
+                                    <span><i class="fas fa-eye"></i> 982 visualizações</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon video">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Limites e Continuidade</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Cálculo I</span>
+                                    <span><i class="fas fa-clock"></i> 52 minutos</span>
+                                    <span><i class="fas fa-eye"></i> 876 visualizações</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon video">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Introdução à Física Moderna</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Física Moderna</span>
+                                    <span><i class="fas fa-clock"></i> 65 minutos</span>
+                                    <span><i class="fas fa-eye"></i> 732 visualizações</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-draft">Rascunho</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon video">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">CSS - Estilização de Páginas Web</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Programação Web</span>
+                                    <span><i class="fas fa-clock"></i> 42 minutos</span>
+                                    <span><i class="fas fa-eye"></i> 856 visualizações</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Questionários Section -->
+        <div class="dashboard" id="quizSection" style="display: none;">
+            <h1 class="dashboard-title">Questionários</h1>
+            <p class="dashboard-subtitle">Crie e gerencie questionários para as videoaulas.</p>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Lista de Questionários</div>
+                    <div class="card-actions">
+                        <div class="card-action tooltip" id="addQuizBtn">
+                            <i class="fas fa-plus"></i>
+                            <div class="tooltip-text">Adicionar questionário</div>
+                        </div>
+                        <div class="card-action tooltip">
+                            <i class="fas fa-filter"></i>
+                            <div class="tooltip-text">Filtrar</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <ul class="content-list">
+                        <li class="content-item">
+                            <div class="content-icon quiz">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Questionário: Introdução à Programação Web</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Programação Web</span>
+                                    <span><i class="fas fa-list-ol"></i> 10 questões</span>
+                                    <span><i class="fas fa-users"></i> 215 respostas</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon quiz">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Questionário: HTML Básico</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Programação Web</span>
+                                    <span><i class="fas fa-list-ol"></i> 8 questões</span>
+                                    <span><i class="fas fa-users"></i> 186 respostas</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon quiz">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Questionário: Limites e Continuidade</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Cálculo I</span>
+                                    <span><i class="fas fa-list-ol"></i> 12 questões</span>
+                                    <span><i class="fas fa-users"></i> 142 respostas</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-active">Ativo</span>
+                            </div>
+                        </li>
+                        
+                        <li class="content-item">
+                            <div class="content-icon quiz">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="content-details">
+                                <div class="content-title">Questionário: Física Moderna</div>
+                                <div class="content-meta">
+                                    <span><i class="fas fa-book"></i> Física Moderna</span>
+                                    <span><i class="fas fa-list-ol"></i> 15 questões</span>
+                                    <span><i class="fas fa-users"></i> 98 respostas</span>
+                                </div>
+                            </div>
+                            <div class="content-status">
+                                <button class="btn-secondary" style="margin-right: 8px; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <span class="status-badge status-draft">Rascunho</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÃO FLUTUANTE COMPLETAMENTE REFEITO -->
+    <button id="newActionButton" class="action-button">
+        <span class="action-button-icon">
+            <i class="fas fa-plus"></i>
+        </span>
+        <span class="action-button-tooltip">Adicionar novo conteúdo</span>
+    </button>
+    
+    <!-- Modais -->
+    <!-- Modal de Upload de Videoaula -->
+    <div class="modal-overlay" id="videoUploadModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Adicionar Nova Videoaula</h3>
+                <button class="modal-close" id="closeVideoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="videoUploadForm">
+                    <div class="form-group">
+                        <label for="videoTitle" class="form-label">Título da Videoaula</label>
+                        <input type="text" id="videoTitle" class="form-control" placeholder="Ex: Introdução à Programação Web">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="videoSubject" class="form-label">Cadeira</label>
+                        <select id="videoSubject" class="form-control">
+                            <option value="">Selecione a cadeira</option>
+                            <option value="prog-web">Programação Web</option>
+                            <option value="calculo">Cálculo I</option>
+                            <option value="fisica">Física Moderna</option>
+                            <option value="bd">Banco de Dados</option>
+                            <option value="ingles">Inglês Técnico</option>
+                            <option value="redes">Redes de Computadores</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="videoDescription" class="form-label">Descrição</label>
+                        <textarea id="videoDescription" class="form-control" placeholder="Descreva o conteúdo da videoaula..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Vídeo</label>
+                        <div class="file-upload">
+                            <input type="file" id="videoFile" accept="video/*">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                <p>Arraste e solte o arquivo de vídeo aqui ou clique para selecionar</p>
+                                <span>Formatos suportados: MP4, MOV, AVI (máx. 1GB)</span>
+                            </div>
+                        </div>
+                        <div class="file-preview" id="videoPreview">
+                            <div class="file-name">
+                                <i class="fas fa-video"></i>
+                                <span id="videoFileName">nome-do-arquivo.mp4</span>
+                                <button type="button" id="removeVideo"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Conteúdo Escrito (opcional)</label>
+                        <textarea id="videoContent" class="form-control" style="min-height: 150px;" placeholder="Insira o conteúdo escrito que acompanha a videoaula..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Criar Questionário?</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="createQuiz" value="yes" style="margin-right: 0.5rem;"> Sim
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="createQuiz" value="no" style="margin-right: 0.5rem;" checked> Não
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="quizFormContainer" style="display: none; border-top: 1px solid #e2e8f0; margin-top: 1.5rem; padding-top: 1.5rem;">
+                        <h4 style="margin-bottom: 1rem;">Questionário</h4>
+                        
+                        <div class="form-group">
+                            <label for="quizTitle" class="form-label">Título do Questionário</label>
+                            <input type="text" id="quizTitle" class="form-control" placeholder="Ex: Questionário - Introdução à Programação Web">
+                        </div>
+                        
+                        <div class="question-list" id="questionsList">
+                            <div class="question-item">
+                                <div class="question-header">
+                                    <h5 class="question-title">Questão 1</h5>
+                                    <div class="question-actions">
+                                        <button type="button"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Digite a pergunta...">
+                                </div>
+                                
+                                <div class="option-list">
+                                    <div class="option-item">
+                                        <input type="radio" name="correct_q1" value="1" checked>
+                                        <input type="text" class="form-control" placeholder="Opção 1">
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" name="correct_q1" value="2">
+                                        <input type="text" class="form-control" placeholder="Opção 2">
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" name="correct_q1" value="3">
+                                        <input type="text" class="form-control" placeholder="Opção 3">
+                                    </div>
+                                    <div class="option-item">
+                                        <input type="radio" name="correct_q1" value="4">
+                                        <input type="text" class="form-control" placeholder="Opção 4">
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="add-option-btn">
+                                    <i class="fas fa-plus-circle"></i> Adicionar opção
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-question-btn" id="addQuestionBtn">
+                            <i class="fas fa-plus"></i> Adicionar nova questão
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelVideoBtn">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveVideoBtn">Salvar Videoaula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Aguardar o carregamento do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navegação entre seções
+            const dashboardLink = document.getElementById('dashboardLink');
+            const subjectsLink = document.getElementById('subjectsLink');
+            const videoLink = document.getElementById('videoLink');
+            const quizLink = document.getElementById('quizLink');
+            const studentsLink = document.getElementById('studentsLink');
+            const materialsLink = document.getElementById('materialsLink');
+            const settingsLink = document.getElementById('settingsLink');
+            const notificationsLink = document.getElementById('notificationsLink');
+            
+            const dashboardSection = document.getElementById('dashboardSection');
+            const subjectsSection = document.getElementById('subjectsSection');
+            const videoSection = document.getElementById('videoSection');
+            const quizSection = document.getElementById('quizSection');
+            
+            // Função para trocar de seção
+            function switchSection(section) {
+                // Esconde todas as seções
+                dashboardSection.style.display = 'none';
+                subjectsSection.style.display = 'none';
+                videoSection.style.display = 'none';
+                quizSection.style.display = 'none';
+                
+                // Remove a classe active de todos os links
+                dashboardLink.classList.remove('active');
+                subjectsLink.classList.remove('active');
+                videoLink.classList.remove('active');
+                quizLink.classList.remove('active');
+                studentsLink.classList.remove('active');
+                materialsLink.classList.remove('active');
+                settingsLink.classList.remove('active');
+                notificationsLink.classList.remove('active');
+                
+                // Mostra a seção selecionada e ativa o link correspondente
+                switch(section) {
+                    case 'dashboard':
+                        dashboardSection.style.display = 'block';
+                        dashboardLink.classList.add('active');
+                        break;
+                    case 'subjects':
+                        subjectsSection.style.display = 'block';
+                        subjectsLink.classList.add('active');
+                        break;
+                    case 'video':
+                        videoSection.style.display = 'block';
+                        videoLink.classList.add('active');
+                        break;
+                    case 'quiz':
+                        quizSection.style.display = 'block';
+                        quizLink.classList.add('active');
+                        break;
+                }
+                
+                // Se estiver em mobile, fecha o sidebar
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('open');
+                }
+            }
+            
+            // Adiciona evento de clique aos links da sidebar
+            dashboardLink.addEventListener('click', () => switchSection('dashboard'));
+            subjectsLink.addEventListener('click', () => switchSection('subjects'));
+            videoLink.addEventListener('click', () => switchSection('video'));
+            quizLink.addEventListener('click', () => switchSection('quiz'));
+            studentsLink.addEventListener('click', () => alert('Funcionalidade em desenvolvimento!'));
+            materialsLink.addEventListener('click', () => alert('Funcionalidade em desenvolvimento!'));
+            settingsLink.addEventListener('click', () => alert('Funcionalidade em desenvolvimento!'));
+            notificationsLink.addEventListener('click', () => alert('Funcionalidade em desenvolvimento!'));
+            
+            // Configuração do gráfico
+            const ctx = document.getElementById('estudantesChart');
+            let estudantesChart = null;
+            
+            if (ctx) {
+                // Verificar se o Chart.js está carregado
+                if (typeof Chart !== 'undefined') {
+                    estudantesChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'],
+                            datasets: [{
+                                label: 'Acessos diários',
+                                data: [120, 190, 170, 250, 220, 310, 290, 340, 330],
+                                backgroundColor: 'rgba(251, 146, 60, 0.1)',
+                                borderColor: '#fb923c',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointBackgroundColor: '#fb923c',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }, {
+                                label: 'Conclusões de questionários',
+                                data: [45, 60, 55, 70, 65, 85, 75, 90, 85],
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: '#f59e0b',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        boxWidth: 12,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    padding: 12,
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        padding: 10
+                                    }
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    top: 10,
+                                    right: 15,
+                                    bottom: 10,
+                                    left: 10
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Chart.js não está carregado corretamente');
+                    // Exibir mensagem ao usuário
+                    ctx.parentNode.innerHTML = '<div style="text-align: center; padding: 50px 0;">Não foi possível carregar o gráfico. Por favor, atualize a página.</div>';
+                }
+
+                               // Função para redimensionar o gráfico quando a janela muda de tamanho
+                               function resizeChart() {
+                    if (estudantesChart) {
+                        // Verificar se o método resize existe antes de chamar
+                        if (typeof estudantesChart.resize === 'function') {
+                            estudantesChart.resize();
+                        } else {
+                            // Alternativa se o método resize não existir
+                            estudantesChart.update();
+                        }
+                    }
+                }
+
+                // Adicionar listener de redimensionamento
+                window.addEventListener('resize', resizeChart);
+            }
+
+            // Controle do sidebar em dispositivos móveis
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.add('open');
+                });
+            }
+
+            if (sidebarClose && sidebar) {
+                sidebarClose.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+            }
+
+            // Também fechar sidebar se clicar fora dele (em mobile)
+            document.addEventListener('click', function(e) {
+                // Fechar sidebar
+                if (sidebar && sidebar.classList.contains('open') &&
+                    !sidebar.contains(e.target) && 
+                    !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+                
+                // Fechar dropdown de notificações quando clicar fora
+                const notificationsDropdown = document.getElementById('notificationsDropdown');
+                const notificationToggle = document.getElementById('notificationToggle');
+                if (notificationsDropdown && notificationToggle && 
+                    !notificationToggle.contains(e.target) && 
+                    !notificationsDropdown.contains(e.target)) {
+                    notificationsDropdown.classList.remove('active');
+                }
+                
+                // Fechar dropdown de usuário quando clicar fora
+                const userDropdown = document.getElementById('userDropdown');
+                const userProfileAction = document.getElementById('userProfileAction');
+                if (userDropdown && userProfileAction && 
+                    !userProfileAction.contains(e.target) && 
+                    !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+
+            // Efeito de clique nos botões
+            const buttons = document.querySelectorAll('.card-action, .menu-item, .topbar-action, .fab, .btn, .add-question-btn, .subject-card');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Prevenir múltiplos ripples
+                    const existingRipples = this.querySelectorAll('.ripple');
+                    existingRipples.forEach(r => r.remove());
+                    
+                    // Criar efeito ripple
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const posX = e.clientX - rect.left - size / 2;
+                    const posY = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.left = `${posX}px`;
+                    ripple.style.top = `${posY}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Sair do Dashboard
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                // Removendo event listener duplicado, já está sendo controlado pelo onclick
+                console.log('Botão de logout na sidebar encontrado');
+                // Apenas definir o cursor
+                logoutBtn.style.cursor = 'pointer';
+            }
+
+            // Controle do Modal de Upload de Videoaula
+            const videoUploadModal = document.getElementById('videoUploadModal');
+            const addVideoBtn = document.getElementById('addVideoBtn');
+            const closeVideoModal = document.getElementById('closeVideoModal');
+            const cancelVideoBtn = document.getElementById('cancelVideoBtn');
+            const saveVideoBtn = document.getElementById('saveVideoBtn');
+            const addContentBtn = document.getElementById('addContentBtn');
+            const addContentAction = document.getElementById('addContentAction');
+            
+            // Função para abrir modal de upload
+            function openVideoModal() {
+                videoUploadModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Impede rolagem da página
+            }
+            
+            // Função para fechar modal de upload
+            function closeVideoModal() {
+                videoUploadModal.classList.remove('active');
+                document.body.style.overflow = ''; // Restaura rolagem da página
+            }
+            
+            // Adicionar eventos aos botões
+            if (addVideoBtn) {
+                addVideoBtn.addEventListener('click', openVideoModal);
+            }
+            
+            if (closeVideoModal) {
+                closeVideoModal.addEventListener('click', closeVideoModal);
+            }
+            
+            if (cancelVideoBtn) {
+                cancelVideoBtn.addEventListener('click', closeVideoModal);
+            }
+            
+            if (saveVideoBtn) {
+                saveVideoBtn.addEventListener('click', function() {
+                    // Aqui você pode implementar a lógica para salvar a videoaula
+                    alert('Videoaula salva com sucesso!');
+                    closeVideoModal();
+                });
+            }
+            
+            if (addContentBtn) {
+                addContentBtn.addEventListener('click', function() {
+                    // Abre o modal de criação de conteúdo baseado na seção atual
+                    const currentSection = document.querySelector('.dashboard[style*="block"]');
+                    
+                    if (currentSection && currentSection.id === 'videoSection') {
+                        openVideoModal();
+                    } else if (currentSection && currentSection.id === 'quizSection') {
+                        alert('Funcionalidade para criar questionário será implementada em breve!');
+                    } else if (currentSection && currentSection.id === 'subjectsSection') {
+                        alert('Funcionalidade para criar cadeira será implementada em breve!');
+                    } else {
+                        alert('Selecione uma seção (Videoaulas, Questionários ou Cadeiras) para adicionar conteúdo.');
+                    }
+                });
+            }
+            
+            if (addContentAction) {
+                addContentAction.addEventListener('click', function() {
+                    // Igual ao botão flutuante
+                    const currentSection = document.querySelector('.dashboard[style*="block"]');
+                    
+                    if (currentSection && currentSection.id === 'videoSection') {
+                        openVideoModal();
+                    } else if (currentSection && currentSection.id === 'quizSection') {
+                        alert('Funcionalidade para criar questionário será implementada em breve!');
+                    } else if (currentSection && currentSection.id === 'subjectsSection') {
+                        alert('Funcionalidade para criar cadeira será implementada em breve!');
+                    } else {
+                        alert('Selecione uma seção (Videoaulas, Questionários ou Cadeiras) para adicionar conteúdo.');
+                    }
+                });
+            }
+            
+            // Fechar modal se clicar fora dele
+            window.addEventListener('click', function(e) {
+                if (e.target === videoUploadModal) {
+                    closeVideoModal();
+                }
+            });
+            
+            // Controle do upload de arquivos de vídeo
+            const videoFile = document.getElementById('videoFile');
+            const videoPreview = document.getElementById('videoPreview');
+            const videoFileName = document.getElementById('videoFileName');
+            const removeVideo = document.getElementById('removeVideo');
+            
+            if (videoFile) {
+                videoFile.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+                        videoFileName.textContent = file.name;
+                        videoPreview.classList.add('active');
+                    }
+                });
+            }
+            
+            if (removeVideo) {
+                removeVideo.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    videoFile.value = '';
+                    videoPreview.classList.remove('active');
+                });
+            }
+            
+            // Controle da funcionalidade de questionário
+            const createQuizRadios = document.querySelectorAll('input[name="createQuiz"]');
+            const quizFormContainer = document.getElementById('quizFormContainer');
+            const addQuestionBtn = document.getElementById('addQuestionBtn');
+            
+            if (createQuizRadios.length) {
+                createQuizRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        if (this.value === 'yes' && quizFormContainer) {
+                            quizFormContainer.style.display = 'block';
+                        } else if (quizFormContainer) {
+                            quizFormContainer.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Função para adicionar nova questão
+            if (addQuestionBtn) {
+                addQuestionBtn.addEventListener('click', function() {
+                    const questionsList = document.getElementById('questionsList');
+                    const questionsCount = questionsList.querySelectorAll('.question-item').length + 1;
+                    
+                    const newQuestion = document.createElement('div');
+                    newQuestion.className = 'question-item';
+                    newQuestion.innerHTML = `
+                        <div class="question-header">
+                            <h5 class="question-title">Questão ${questionsCount}</h5>
+                            <div class="question-actions">
+                                <button type="button"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Digite a pergunta...">
+                        </div>
+                        
+                        <div class="option-list">
+                            <div class="option-item">
+                                <input type="radio" name="correct_q${questionsCount}" value="1" checked>
+                                <input type="text" class="form-control" placeholder="Opção 1">
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" name="correct_q${questionsCount}" value="2">
+                                <input type="text" class="form-control" placeholder="Opção 2">
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" name="correct_q${questionsCount}" value="3">
+                                <input type="text" class="form-control" placeholder="Opção 3">
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" name="correct_q${questionsCount}" value="4">
+                                <input type="text" class="form-control" placeholder="Opção 4">
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-option-btn">
+                            <i class="fas fa-plus-circle"></i> Adicionar opção
+                        </button>
+                    `;
+                    
+                    questionsList.appendChild(newQuestion);
+                    
+                    // Adicionar evento para o botão de adicionar opção
+                    const addOptionBtn = newQuestion.querySelector('.add-option-btn');
+                    addOptionBtn.addEventListener('click', function() {
+                        const optionList = this.previousElementSibling;
+                        const optionsCount = optionList.querySelectorAll('.option-item').length + 1;
+                        
+                        const newOption = document.createElement('div');
+                        newOption.className = 'option-item';
+                        newOption.innerHTML = `
+                            <input type="radio" name="correct_q${questionsCount}" value="${optionsCount}">
+                            <input type="text" class="form-control" placeholder="Opção ${optionsCount}">
+                        `;
+                        
+                        optionList.appendChild(newOption);
+                    });
+                    
+                    // Adicionar evento para o botão de remover questão
+                    const removeQuestionBtn = newQuestion.querySelector('.question-actions button');
+                    removeQuestionBtn.addEventListener('click', function() {
+                        if (confirm('Tem certeza que deseja remover esta questão?')) {
+                            newQuestion.remove();
+                            
+                            // Renumerar as questões restantes
+                            const questions = questionsList.querySelectorAll('.question-item');
+                            questions.forEach((q, index) => {
+                                q.querySelector('.question-title').textContent = `Questão ${index + 1}`;
+                                
+                                // Atualizar os names dos radios
+                                const radios = q.querySelectorAll('input[type="radio"]');
+                                radios.forEach(radio => {
+                                    radio.name = `correct_q${index + 1}`;
+                                });
+                            });
+                        }
+                    });
+                });
+                
+                // Adicionar eventos aos botões de adicionar opção das questões existentes
+                document.querySelectorAll('.add-option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const optionList = this.previousElementSibling;
+                        const questionItem = this.closest('.question-item');
+                        const questionNumber = questionItem.querySelector('.question-title').textContent.replace('Questão ', '');
+                        const optionsCount = optionList.querySelectorAll('.option-item').length + 1;
+                        
+                        const newOption = document.createElement('div');
+                        newOption.className = 'option-item';
+                        newOption.innerHTML = `
+                            <input type="radio" name="correct_q${questionNumber}" value="${optionsCount}">
+                            <input type="text" class="form-control" placeholder="Opção ${optionsCount}">
+                        `;
+                        
+                        optionList.appendChild(newOption);
+                    });
+                });
+                
+                // Adicionar eventos aos botões de remover questão das questões existentes
+                document.querySelectorAll('.question-actions button').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const questionItem = this.closest('.question-item');
+                        
+                        if (confirm('Tem certeza que deseja remover esta questão?')) {
+                            questionItem.remove();
+                            
+                            // Renumerar as questões restantes
+                            const questionsList = document.getElementById('questionsList');
+                            const questions = questionsList.querySelectorAll('.question-item');
+                            questions.forEach((q, index) => {
+                                q.querySelector('.question-title').textContent = `Questão ${index + 1}`;
+                                
+                                // Atualizar os names dos radios
+                                const radios = q.querySelectorAll('input[type="radio"]');
+                                radios.forEach(radio => {
+                                    radio.name = `correct_q${index + 1}`;
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // Adicionar Cadeira
+            const addSubjectBtn = document.getElementById('addSubjectBtn');
+            if (addSubjectBtn) {
+                addSubjectBtn.addEventListener('click', function() {
+                    alert('Funcionalidade para adicionar cadeira será implementada em breve!');
+                });
+            }
+
+            // Verificar truncamento de texto e adicionar tooltips
+            function addTooltipsToTruncatedElements() {
+                const elements = document.querySelectorAll('.content-title, .activity-text, .subject-title, .subject-description');
+                
+                elements.forEach(el => {
+                    // Garantir que o elemento está renderizado
+                    if (el.offsetWidth && el.scrollWidth && el.offsetWidth < el.scrollWidth) {
+                        // Texto está truncado
+                        el.title = el.textContent.trim();
+                    }
+                });
+            }
+
+            // Inicialização do painel com pequeno delay para garantir renderização completa
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    // Verificar truncamento de texto
+                    addTooltipsToTruncatedElements();
+                    
+                    // Animação de entrada
+                    document.querySelectorAll('.stat-card, .card, .subject-card').forEach((item, index) => {
+                        item.style.opacity = 0;
+                        setTimeout(() => {
+                            item.style.opacity = 1;
+                        }, 100 + index * 50); // Escalonar animação
+                    });
+                }, 200);
+                
+                // Verificar se vem da página de login
+                const referrer = document.referrer;
+                if (referrer.includes('login')) {
+                    // Exibir mensagem de boas-vindas personalizada
+                    const welcomeTime = new Date().getHours();
+                    let greeting = "Bom dia";
+                    
+                    if (welcomeTime >= 12 && welcomeTime < 18) {
+                        greeting = "Boa tarde";
+                    } else if (welcomeTime >= 18 || welcomeTime < 5) {
+                        greeting = "Boa noite";
+                    }
+                    
+                    const subtitle = document.querySelector('.dashboard-subtitle');
+                    if (subtitle) {
+                        subtitle.textContent = `${greeting}, Darciocalei! Gerencie seu portal educativo.`;
+                    }
+                }
+            });
+
+            // Adicionar listener de redimensionamento para verificar truncamento
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                // Debounce para evitar múltiplas chamadas
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(addTooltipsToTruncatedElements, 200);
+            });
+
+            // Modifique a função de clique no subjectsLink
+            if (subjectsLink) {
+                subjectsLink.addEventListener('click', function(e) {
+                    // Previne comportamento padrão caso seja um link
+                    if (e && e.preventDefault) e.preventDefault();
+                    
+                    // Redireciona para a página de cadeiras
+                    window.location.href = 'gerenciar-cadeiras.html';
+                    
+                    // Debug para verificar se a função está sendo chamada
+                    console.log('Clicou em Cadeiras, redirecionando...');
+                });
+            } else {
+                // Debug para verificar se o elemento está sendo encontrado
+                console.log('Elemento subjectsLink não encontrado!');
+            }
+
+            // Controle do dropdown de notificações
+            const notificationToggle = document.getElementById('notificationToggle');
+            const notificationsDropdown = document.getElementById('notificationsDropdown');
+            
+            if (notificationToggle && notificationsDropdown) {
+                notificationToggle.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Evita que o clique propague para o documento
+                    notificationsDropdown.classList.toggle('show');
+                });
+                
+                // Itens do dropdown
+                const notificationItemPreviews = document.querySelectorAll('.notification-item-preview');
+                notificationItemPreviews.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Redireciona para a página de notificações
+                        window.location.href = 'notificações.html';
+                    });
+                });
+                
+                // Fechar ao clicar fora
+                document.addEventListener('click', function(e) {
+                    if (!notificationsDropdown.contains(e.target) && notificationsDropdown.classList.contains('show')) {
+                        notificationsDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            // Controle do dropdown de perfil do usuário
+            const userProfileAction = document.getElementById('userProfileAction');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userProfileAction && userDropdown) {
+                userProfileAction.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                    
+                    // Fecha o dropdown de notificações se estiver aberto
+                    if (notificationsDropdown) {
+                        notificationsDropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Botão de logout na topbar
+            const topbarLogoutBtn = document.getElementById('topbarLogoutBtn');
+            if (topbarLogoutBtn) {
+                // Removendo event listener duplicado, já está sendo controlado pelo onclick
+                console.log('Botão de logout na topbar encontrado');
+                // Apenas definir o cursor
+                topbarLogoutBtn.style.cursor = 'pointer';
+            }
+        });
+
+        // SCRIPT PARA O NOVO BOTÃO
+        document.addEventListener('DOMContentLoaded', function() {
+            const newActionButton = document.getElementById('newActionButton');
+            
+            if (newActionButton) {
+                newActionButton.addEventListener('click', function() {
+                    // Abre o modal de criação de conteúdo baseado na seção atual
+                    const currentSection = document.querySelector('.dashboard[style*="block"]');
+                    
+                    if (currentSection && currentSection.id === 'videoSection') {
+                        if (typeof openVideoModal === 'function') {
+                            openVideoModal();
+                        } else {
+                            alert('Funcionalidade para criar videoaula será implementada em breve!');
+                        }
+                    } else if (currentSection && currentSection.id === 'quizSection') {
+                        alert('Funcionalidade para criar questionário será implementada em breve!');
+                    } else if (currentSection && currentSection.id === 'subjectsSection') {
+                        alert('Funcionalidade para criar cadeira será implementada em breve!');
+                    } else {
+                        alert('Selecione uma seção (Videoaulas, Questionários ou Cadeiras) para adicionar conteúdo.');
+                    }
+                });
+                
+                // Adicionar efeito de onda ao clicar (ripple effect)
+                newActionButton.addEventListener('mousedown', function(e) {
+                    const button = this;
+                    const ripple = document.createElement('span');
+                    const rect = button.getBoundingClientRect();
+                    
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                    ripple.style.width = '100px';
+                    ripple.style.height = '100px';
+                    ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear forwards';
+                    
+                    ripple.style.left = e.clientX - rect.left + 'px';
+                    ripple.style.top = e.clientY - rect.top + 'px';
+                    
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            }
+            
+            // Adicionar uma keyframe de animação para o ripple
+            if (!document.querySelector('#rippleAnimation')) {
+                const style = document.createElement('style');
+                style.id = 'rippleAnimation';
+                style.textContent = `
+                    @keyframes ripple {
+                        to {
+                            transform: translate(-50%, -50%) scale(3);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        });
+
+        // Adicione este código no script do dashboard-admin.html
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navegação para a página de gerenciamento de cadeiras
+            const subjectsLink = document.querySelector('.nav-item[data-section="subjects"]');
+            
+            if (subjectsLink) {
+                subjectsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'gerenciar-cadeiras.html';
+                });
+            }
+            
+            // Também podemos adicionar para o botão na seção de cadeiras, se existir
+            const viewAllSubjectsBtn = document.querySelector('.view-all-subjects');
+            
+            if (viewAllSubjectsBtn) {
+                viewAllSubjectsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'gerenciar-cadeiras.html';
+                });
+            }
+            
+            // ... existing code ...
+        });
+
+        document.getElementById('videoLink').addEventListener('click', function() {
+            window.location.href = 'video-aulas.html';
+        });
+        
+        // Função para realizar o logout
+        function fazerLogout() {
+            console.log('Função de logout executada');
+            if (confirm('Tem certeza que deseja sair?')) {
+                console.log('Logout confirmado');
+                
+                try {
+                    // Limpar dados da sessão
+                    localStorage.removeItem('user_session');
+                    sessionStorage.clear();
+                    
+                    // Remover todos os cookies relacionados à sessão
+                    document.cookie.split(";").forEach(function(c) {
+                        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                    });
+                    
+                    console.log('Redirecionando para a tela de login...');
+                    // Redirecionar para a página de login
+                    window.location.replace('tela-login.html');
+                } catch (error) {
+                    console.error('Erro durante o logout:', error);
+                    alert('Erro ao fazer logout: ' + error.message);
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</body>
+</html>

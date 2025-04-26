@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiais de Estudo | Sistema Educacional</title>
+    <style>
+        :root {
+            --primary-color: #ff9500;
+            --primary-light: #ffbb33;
+            --primary-dark: #ff6d00;
+            --secondary-color: #ffcc80;
+            --text-color: #333;
+            --text-light: #6b7280;
+            --bg-color: #fff;
+            --bg-secondary: #fffaf0;
+            --border-color: #ffe0b2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(255, 149, 0, 0.1), 0 4px 6px -2px rgba(255, 149, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #ffcc80 0%, #ff9500 100%);
+            --gradient-secondary: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            --animation-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8e1 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all var(--animation-speed);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Tabs Styles */
+        .tabs {
+            display: flex;
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all var(--animation-speed);
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0;
+            transition: opacity var(--animation-speed);
+            z-index: -1;
+        }
+
+        .tab:hover:before {
+            opacity: 0.5;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab.active:before {
+            opacity: 1;
+        }
+
+        /* Containers */
+        .materiais-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform var(--animation-speed);
+        }
+
+        .materiais-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .materiais-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--gradient-secondary);
+        }
+
+        .materiais-title {
+            font-size: 1.25rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .materiais-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Search and Filter Styles */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(255, 149, 0, 0.1);
+        }
+
+        .search-box:focus-within {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        .search-box i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            background-color: white;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(255, 149, 0, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--animation-speed);
+            border: none;
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: translate(-50%, -50%) scale(1);
+            transition: opacity 1s, transform 0.5s;
+        }
+
+        .btn:active:after {
+            animation: ripple 0.6s;
+            opacity: 1;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(50);
+                opacity: 0;
+            }
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ffb74d 0%, #ff8f00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--primary-color);
+        }
+
+        /* Materiais Grid */
+        .materiais-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .material-card {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(255, 149, 0, 0.1);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all var(--animation-speed);
+            position: relative;
+            z-index: 1;
+        }
+
+        .material-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(255, 149, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .material-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            z-index: -1;
+        }
+
+        .material-type-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all var(--animation-speed);
+        }
+
+        .material-card:hover .material-type-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .material-cadeira-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.7);
+            color: var(--primary-dark);
+            backdrop-filter: blur(5px);
+        }
+
+        .material-body {
+            padding: 1.5rem;
+        }
+
+        .material-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--primary-dark);
+        }
+
+        .material-description {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .material-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+        }
+
+        .material-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+        }
+
+        .material-size {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all var(--animation-speed);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.1);
+        }
+
+        /* Lista de Materiais (view alternativa) */
+        .materiais-list {
+            padding: 1.5rem;
+        }
+
+        .material-list-item {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--animation-speed);
+        }
+
+        .material-list-item:hover {
+            background-color: var(--bg-secondary);
+            transform: translateX(5px);
+        }
+
+        .material-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .material-list-icon {
+            width: 45px;
+            height: 45px;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .material-list-info {
+            flex: 1;
+        }
+
+        .material-list-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-dark);
+        }
+
+        .material-list-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .material-list-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Upload Progress */
+        .upload-container {
+            padding: 1.5rem;
+        }
+
+        .upload-progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .upload-progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .upload-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .upload-info {
+            flex: 1;
+        }
+
+        .upload-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .upload-status {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .upload-size {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--animation-speed);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateY(50px) scale(0.95);
+            transition: all var(--animation-speed);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gradient-secondary);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all var(--animation-speed);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--primary-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background-color: var(--bg-secondary);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Drag and Drop Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: all var(--animation-speed);
+            background-color: var(--bg-secondary);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.05);
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            transition: all var(--animation-speed);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 149, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label i {
+            color: var(--primary-color);
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Background elements */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .circle-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .materiais-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .materiais-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .material-list-item {
+                flex-wrap: wrap;
+            }
+            
+            .material-list-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .materiais-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Elementos decorativos de fundo -->
+    <div class="background-elements">
+        <div class="circle-element" style="top: 20%; left: 5%; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(255, 236, 179, 0.3) 0%, rgba(255, 167, 38, 0.3) 100%); filter: blur(40px);"></div>
+        <div class="circle-element" style="top: 60%; right: 8%; width: 250px; height: 250px; background: linear-gradient(135deg, rgba(255, 204, 128, 0.3) 0%, rgba(255, 149, 0, 0.3) 100%); filter: blur(40px);"></div>
+        <div class="circle-element" style="bottom: 10%; left: 15%; width: 200px; height: 200px; background: linear-gradient(135deg, rgba(255, 167, 38, 0.3) 0%, rgba(255, 109, 0, 0.3) 100%); filter: blur(30px);"></div>
+    </div>
+
+    <header>
+        <div class="header-title">
+            <h1><i class="fas fa-folder-open"></i> Materiais de Estudo</h1>
+        </div>
+        <div class="header-actions">
+            <a href="dashboard-admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">128</div>
+                <div class="stat-label">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Total de Materiais</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">15</div>
+                <div class="stat-label">
+                    <i class="fas fa-upload"></i>
+                    <span>Uploads este mês</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">324</div>
+                <div class="stat-label">
+                    <i class="fas fa-download"></i>
+                    <span>Downloads</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">4.8GB</div>
+                <div class="stat-label">
+                    <i class="fas fa-database"></i>
+                    <span>Espaço utilizado</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="todos">Todos os Materiais</div>
+            <div class="tab" data-tab="documentos">Documentos</div>
+            <div class="tab" data-tab="apresentacoes">Apresentações</div>
+            <div class="tab" data-tab="videos">Vídeos</div>
+            <div class="tab" data-tab="outros">Outros</div>
+        </div>
+        
+        <!-- Tab Content: Todos os Materiais -->
+        <div class="tab-content" id="todosTab">
+            <div class="materiais-container">
+                <div class="materiais-header">
+                    <h3 class="materiais-title">Materiais Disponíveis</h3>
+                    <div class="materiais-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchMateriais" placeholder="Pesquisar materiais...">
+                        </div>
+                        <select class="filter-select">
+                            <option value="all">Todos os tipos</option>
+                            <option value="pdf">PDFs</option>
+                            <option value="doc">Documentos</option>
+                            <option value="ppt">Apresentações</option>
+                            <option value="video">Vídeos</option>
+                            <option value="other">Outros</option>
+                        </select>
+                        <select class="filter-select">
+                            <option value="recent">Mais recentes</option>
+                            <option value="popular">Mais populares</option>
+                            <option value="az">A-Z</option>
+                            <option value="za">Z-A</option>
+                        </select>
+                        <button id="addMaterialBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Novo Material
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="materiais-grid">
+                    <!-- Material cards will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+        Continuando a criação do arquivo materiais.html:
+
+        <!-- Material 1 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="material-cadeira-badge">Programação Web</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Introdução a HTML e CSS</h3>
+                <p class="material-description">Material completo sobre os fundamentos de HTML5 e CSS3, incluindo exemplos práticos e exercícios para prática.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 15/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>42 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">2.4 MB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Material 2 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-powerpoint"></i>
+                </div>
+                <div class="material-cadeira-badge">Cálculo I</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Apresentação sobre Limites e Derivadas</h3>
+                <p class="material-description">Slides da apresentação sobre conceitos de limites e derivadas, com exemplos resolvidos e gráficos explicativos.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 10/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>28 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">5.7 MB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Material 3 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <div class="material-cadeira-badge">Física Moderna</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Apostila de Mecânica Quântica</h3>
+                <p class="material-description">Documento detalhado abordando os princípios fundamentais da mecânica quântica, equações e exemplos práticos.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 05/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>36 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">3.8 MB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Material 4 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-code"></i>
+                </div>
+                <div class="material-cadeira-badge">Programação Web</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Exemplos de código JavaScript</h3>
+                <p class="material-description">Conjunto de exemplos e snippets de código JavaScript para manipulação do DOM, eventos e requisições AJAX.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 12/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>54 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">1.2 MB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Material 5 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="material-cadeira-badge">Banco de Dados</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Planilha de Modelagem ER</h3>
+                <p class="material-description">Template para modelagem de entidade-relacionamento, incluindo exemplos de bancos de dados relacionais.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 08/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>19 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">780 KB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Material 6 -->
+        <div class="material-card">
+            <div class="material-header">
+                <div class="material-type-icon">
+                    <i class="fas fa-file-archive"></i>
+                </div>
+                <div class="material-cadeira-badge">Programação Web</div>
+            </div>
+            <div class="material-body">
+                <h3 class="material-title">Pacote de Projetos Frontend</h3>
+                <p class="material-description">Arquivos de projetos para prática de desenvolvimento frontend, incluindo layouts responsivos e componentes reutilizáveis.</p>
+                <div class="material-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Adicionado em 02/04/2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-download"></i>
+                        <span>67 downloads</span>
+                    </div>
+                </div>
+                <div class="material-actions">
+                    <div class="material-size">8.5 MB</div>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Tab Content: View em lista -->
+<div class="tab-content" id="documentosTab" style="display: none;">
+<div class="materiais-container">
+    <div class="materiais-header">
+        <h3 class="materiais-title">Documentos</h3>
+        <div class="materiais-actions">
+            <button class="btn btn-secondary">
+                <i class="fas fa-sort"></i>
+                <span>Ordenar</span>
+            </button>
+            <button class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Adicionar</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="materiais-list">
+        <!-- Item 1 -->
+        <div class="material-list-item">
+            <div class="material-list-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="material-list-info">
+                <h4 class="material-list-title">Introdução a HTML e CSS</h4>
+                <div class="material-list-meta">
+                    <span><i class="fas fa-folder"></i> Programação Web</span>
+                    <span><i class="fas fa-calendar-alt"></i> 15/04/2024</span>
+                    <span><i class="fas fa-download"></i> 42 downloads</span>
+                    <span><i class="fas fa-file-alt"></i> 2.4 MB</span>
+                </div>
+            </div>
+            <div class="material-list-actions">
+                <button class="action-btn">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Item 2 -->
+        <div class="material-list-item">
+            <div class="material-list-icon">
+                <i class="fas fa-file-word"></i>
+            </div>
+            <div class="material-list-info">
+                <h4 class="material-list-title">Apostila de Mecânica Quântica</h4>
+                <div class="material-list-meta">
+                    <span><i class="fas fa-folder"></i> Física Moderna</span>
+                    <span><i class="fas fa-calendar-alt"></i> 05/04/2024</span>
+                    <span><i class="fas fa-download"></i> 36 downloads</span>
+                    <span><i class="fas fa-file-alt"></i> 3.8 MB</span>
+                </div>
+            </div>
+            <div class="material-list-actions">
+                <button class="action-btn">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Item 3 -->
+        <div class="material-list-item">
+            <div class="material-list-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <div class="material-list-info">
+                <h4 class="material-list-title">Exercícios Resolvidos de Cálculo I</h4>
+                <div class="material-list-meta">
+                    <span><i class="fas fa-folder"></i> Cálculo I</span>
+                    <span><i class="fas fa-calendar-alt"></i> 20/03/2024</span>
+                    <span><i class="fas fa-download"></i> 58 downloads</span>
+                    <span><i class="fas fa-file-alt"></i> 4.2 MB</span>
+                </div>
+            </div>
+            <div class="material-list-actions">
+                <button class="action-btn">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Outras abas teriam estrutura similar -->
+<div class="tab-content" id="apresentacoesTab" style="display: none;">
+<!-- Conteúdo para apresentações -->
+</div>
+
+<div class="tab-content" id="videosTab" style="display: none;">
+<!-- Conteúdo para vídeos -->
+</div>
+
+<div class="tab-content" id="outrosTab" style="display: none;">
+<!-- Conteúdo para outros tipos -->
+</div>
+</main>
+
+<!-- Modal para Adicionar/Editar Material -->
+<div class="modal-overlay" id="materialModal">
+<div class="modal-container">
+<div class="modal-header">
+    <h3 class="modal-title">Adicionar Novo Material</h3>
+    <button class="modal-close" id="closeMaterialModal">&times;</button>
+</div>
+<div class="modal-body">
+    <form id="materialForm">
+        <div class="form-group">
+            <label for="materialTitulo" class="form-label">Título do Material</label>
+            <input type="text" id="materialTitulo" class="form-input" placeholder="Ex: Introdução ao HTML e CSS">
+        </div>
+
+        <div class="form-group">
+            <label for="materialDescricao" class="form-label">Descrição</label>
+            <textarea id="materialDescricao" class="form-textarea" placeholder="Descreva o conteúdo do material..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="materialCadeira" class="form-label">Cadeira</label>
+            <select id="materialCadeira" class="form-select">
+                <option value="">Selecione uma cadeira</option>
+                <option value="web">Programação Web</option>
+                <option value="calc">Cálculo I</option>
+                <option value="fisica">Física Moderna</option>
+                <option value="bd">Banco de Dados</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Arquivo</label>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">Arraste e solte arquivos aqui ou clique para selecionar</div>
+                <div class="upload-hint">Formatos suportados: PDF, DOCX, PPT, XLSX, ZIP (máx. 50MB)</div>
+                <input type="file" id="fileInput" class="file-input">
+            </div>
+
+            <div class="upload-container">
+                <div class="upload-item" style="display: none;" id="uploadPreview">
+                    <div class="material-list-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="upload-info">
+                        <div class="upload-name">arquivo.pdf</div>
+                        <div class="upload-status">Aguardando upload...</div>
+                        <div class="upload-progress-bar">
+                            <div class="upload-progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="upload-size">2.4 MB</div>
+                    <div class="upload-actions">
+                        <button type="button" class="action-btn" id="removeFileBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="materialTags" class="form-label">Tags (separadas por vírgula)</label>
+            <input type="text" id="materialTags" class="form-input" placeholder="Ex: html, css, tutorial">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Visibilidade</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="radio" id="visibilityPublic" name="visibility" value="public" checked>
+                    <label for="visibilityPublic">Público</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="radio" id="visibilityRestricted" name="visibility" value="restricted">
+                    <label for="visibilityRestricted">Restrito (Apenas estudantes matriculados)</label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary" id="cancelMaterialBtn">Cancelar</button>
+    <button class="btn btn-primary" id="saveMaterialBtn">Salvar Material</button>
+</div>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Controle de abas
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Remove a classe active de todas as abas
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        // Adiciona a classe active na aba clicada
+        this.classList.add('active');
+        
+        // Esconde todos os conteúdos de aba
+        tabContents.forEach(content => {
+            content.style.display = 'none';
+        });
+        
+        // Mostra o conteúdo correspondente à aba clicada
+        const tabId = this.getAttribute('data-tab');
+        const targetTab = document.getElementById(tabId + 'Tab');
+        if (targetTab) {
+            targetTab.style.display = 'block';
+        } else {
+            console.error(`Tab content with ID "${tabId}Tab" not found`);
+        }
+    });
+});
+
+// Modal de adicionar/editar material
+const addMaterialBtn = document.getElementById('addMaterialBtn');
+const materialModal = document.getElementById('materialModal');
+const closeMaterialModal = document.getElementById('closeMaterialModal');
+const cancelMaterialBtn = document.getElementById('cancelMaterialBtn');
+const saveMaterialBtn = document.getElementById('saveMaterialBtn');
+
+// Função para abrir o modal
+function openMaterialModal() {
+    materialModal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Impede rolagem da página
+}
+
+// Função para fechar o modal
+function closeMaterialModal() {
+    materialModal.classList.remove('active');
+    document.body.style.overflow = ''; // Restaura rolagem da página
+    // Limpar o formulário
+    document.getElementById('materialForm').reset();
+    document.getElementById('uploadPreview').style.display = 'none';
+}
+
+// Eventos para os botões
+if (addMaterialBtn) {
+    addMaterialBtn.addEventListener('click', openMaterialModal);
+}
+
+if (closeMaterialModal) {
+    closeMaterialModal.addEventListener('click', closeMaterialModal);
+}
+
+if (cancelMaterialBtn) {
+    cancelMaterialBtn.addEventListener('click', closeMaterialModal);
+}
+
+if (saveMaterialBtn) {
+    saveMaterialBtn.addEventListener('click', function() {
+        // Aqui você implementaria a lógica para salvar o material
+        // Por enquanto, apenas simulamos o sucesso
+        
+        const titulo = document.getElementById('materialTitulo').value;
+        
+        if (!titulo) {
+            alert('Por favor, preencha pelo menos o título do material.');
+            return;
+        }
+        
+        closeMaterialModal();
+        
+        // Simulação de mensagem de sucesso
+        alert(`Material "${titulo}" salvo com sucesso!`);
+    });
+}
+
+// Drag and drop para upload de arquivos
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const uploadPreview = document.getElementById('uploadPreview');
+const removeFileBtn = document.getElementById('removeFileBtn');
+
+if (uploadArea && fileInput) {
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files.length) {
+            handleFile(this.files[0]);
+        }
+    });
+    
+    function handleFile(file) {
+        const uploadName = uploadPreview.querySelector('.upload-name');
+        const uploadSize = uploadPreview.querySelector('.upload-size');
+        const uploadStatus = uploadPreview.querySelector('.upload-status');
+        const uploadProgressFill = uploadPreview.querySelector('.upload-progress-fill');
+        
+        // Atualizar informações do arquivo
+        uploadName.textContent = file.name;
+        uploadSize.textContent = formatFileSize(file.size);
+        uploadStatus.textContent = 'Iniciando upload...';
+        uploadPreview.style.display = 'flex';
+        
+        // Atualizar o ícone baseado no tipo de arquivo
+        const fileIcon = uploadPreview.querySelector('.material-list-icon i');
+        fileIcon.className = getFileIconClass(file.name);
+        
+        // Simular progresso de upload
+        let progress = 0;
+        const interval = setInterval(function() {
+            progress += 5;
+            uploadProgressFill.style.width = progress + '%';
+            
+            if (progress < 100) {
+                uploadStatus.textContent = `Fazendo upload... ${progress}%`;
+            } else {
+                uploadStatus.textContent = 'Upload completo!';
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+    
+    // Remover arquivo
+    if (removeFileBtn) {
+        removeFileBtn.addEventListener('click', function() {
+            uploadPreview.style.display = 'none';
+            fileInput.value = '';
+        });
+    }
+    
+    // Funções auxiliares
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        
+        return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function getFileIconClass(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        
+        switch (extension) {
+            case 'pdf':
+                return 'fas fa-file-pdf';
+            case 'doc':
+            case 'docx':
+                return 'fas fa-file-word';
+            case 'ppt':
+            case 'pptx':
+                return 'fas fa-file-powerpoint';
+            case 'xls':
+            case 'xlsx':
+                return 'fas fa-file-excel';
+            case 'zip':
+            case 'rar':
+                return 'fas fa-file-archive';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return 'fas fa-file-image';
+            case 'mp4':
+            case 'avi':
+            case 'mov':
+                return 'fas fa-file-video';
+            case 'js':
+            case 'html':
+            case 'css':
+                return 'fas fa-file-code';
+            default:
+                return 'fas fa-file-alt';
+        }
+    }
+}
+
+// Pesquisa de materiais
+const searchInput = document.getElementById('searchMateriais');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const materialCards = document.querySelectorAll('.material-card');
+        
+        materialCards.forEach(card => {
+            const title = card.querySelector('.material-title').textContent.toLowerCase();
+            const description = card.querySelector('.material-description').textContent.toLowerCase();
+            const cadeira = card.querySelector('.material-cadeira-badge').textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || description.includes(searchTerm) || cadeira.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+}
+
+// Botões de download (simulação)
+document.querySelectorAll('.action-btn .fa-download').forEach(icon => {
+    const btn = icon.closest('.action-btn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            // Encontrar o título do material
+            let title = '';
+            
+            if (this.closest('.material-card')) {
+                title = this.closest('.material-card').querySelector('.material-title').textContent;
+            } else if (this.closest('.material-list-item')) {
+                title = this.closest('.material-list-item').querySelector('.material-list-title').textContent;
+            }
+            
+            // Simulação de download
+            alert(`Download iniciado: ${title}`);
+        });
+    }
+});
+
+// Botões de editar (simulação)
+document.querySelectorAll('.action-btn .fa-edit').forEach(icon => {
+    const btn = icon.closest('.action-btn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            // Encontrar o título do material
+            let title = '';
+            
+            if (this.closest('.material-card')) {
+                title = this.closest('.material-card').querySelector('.material-title').textContent;
+            } else if (this.closest('.material-list-item')) {
+                title = this.closest('.material-list-item').querySelector('.material-list-title').textContent;
+            }
+            
+            // Abrir modal e preencher com informações existentes
+            document.getElementById('materialTitulo').value = title;
+            document.querySelector('#materialModal .modal-title').textContent = 'Editar Material';
+            
+            // Simulação - preencher mais dados
+            document.getElementById('materialDescricao').value = 'Descrição do material...';
+            
+            // Abrir o modal
+            openMaterialModal();
+        });
+    }
+});
+
+// Botões de excluir (simulação)
+document.querySelectorAll('.action-btn .fa-trash').forEach(icon => {
+    const btn = icon.closest('.action-btn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            // Encontrar o título do material
+            const item = this.closest('.material-list-item');
+            const title = item.querySelector('.material-list-title').textContent;
+            
+            // Confirmar exclusão
+            if (confirm(`Tem certeza que deseja excluir o material "${title}"?`)) {
+                // Simulação de exclusão
+                item.style.opacity = '0.5';
+                setTimeout(() => {
+                    item.remove();
+                }, 500);
+                
+                alert(`Material "${title}" excluído com sucesso.`);
+            }
+        });
+    }
+});
+
+// Fechar modal se clicar fora
+window.addEventListener('click', function(e) {
+if (e.target === materialModal) {
+closeMaterialModal();
+}
+});
+});
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</body>
+</html>

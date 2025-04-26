@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionários | Sistema Educacional</title>
+    <!-- Importando Font Awesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9500;
+            --primary-light: #ffbb33;
+            --primary-dark: #ff6d00;
+            --secondary-color: #ffcc80;
+            --text-color: #333;
+            --text-light: #6b7280;
+            --bg-color: #fff;
+            --bg-secondary: #fffaf0;
+            --border-color: #ffe0b2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --card-shadow: 0 10px 15px -3px rgba(255, 149, 0, 0.1), 0 4px 6px -2px rgba(255, 149, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #ffcc80 0%, #ff9500 100%);
+            --gradient-secondary: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            --animation-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #fff8e1 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            box-shadow: var(--card-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all var(--animation-speed);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Tabs Styles */
+        .tabs {
+            display: flex;
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all var(--animation-speed);
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0;
+            transition: opacity var(--animation-speed);
+            z-index: -1;
+        }
+
+        .tab:hover:before {
+            opacity: 0.5;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab.active:before {
+            opacity: 1;
+        }
+
+        /* Containers */
+        .questionarios-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform var(--animation-speed);
+        }
+
+        .questionarios-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .questionarios-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--gradient-secondary);
+        }
+
+        .questionarios-title {
+            font-size: 1.25rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .questionarios-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Questionarios List Styles */
+        .questionarios-list {
+            padding: 1rem;
+        }
+
+        .questionario-item {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--animation-speed);
+            border-left: 4px solid transparent;
+        }
+
+        .questionario-item:hover {
+            background-color: #fff;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .questionario-info {
+            flex: 1;
+        }
+
+        .questionario-title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .questionario-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .questionario-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            color: var(--primary-color);
+            transition: all var(--animation-speed);
+            border: 1px solid var(--border-color);
+            padding: 0;
+        }
+
+        .btn-icon:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Search and Filter Styles */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(255, 149, 0, 0.1);
+        }
+
+        .search-box:focus-within {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        .search-box i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            background: transparent;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            background-color: white;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-state img {
+            max-width: 200px;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--animation-speed);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(20px);
+            transition: transform var(--animation-speed);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color var(--animation-speed);
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all var(--animation-speed);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .questionario-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .questionario-actions {
+                margin-top: 1rem;
+                align-self: flex-end;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 0 0 50%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-actions {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .questionario-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .tab {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* Novos estilos para o painel de estatísticas */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--animation-speed);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Estilos para o guia rápido */
+        .guide-container {
+            background-color: var(--bg-color);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .guide-header {
+            padding: 1.25rem;
+            background: var(--gradient-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .guide-header h3 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-collapse {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: all var(--animation-speed);
+        }
+
+        .btn-collapse:hover {
+            background-color: rgba(255, 149, 0, 0.1);
+        }
+
+        .guide-content {
+            padding: 1.5rem;
+        }
+
+        .guide-content > p {
+            margin-bottom: 1.25rem;
+            color: var(--text-light);
+        }
+
+        .guide-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .guide-step {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            background-color: var(--bg-secondary);
+            transition: all var(--animation-speed);
+        }
+
+        .guide-step:hover {
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Responsividade para as novas seções */
+        @media (max-width: 992px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>Questionários</h1>
+        </div>
+        <div class="header-actions">
+            <a href="dashboard-admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Novo painel de estatísticas -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">Total de Questionários</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">Questionários Ativos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">1.876</div>
+                    <div class="stat-label">Respostas Recebidas</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">78%</div>
+                    <div class="stat-label">Taxa de Conclusão</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guia rápido -->
+        <div class="guide-container">
+            <div class="guide-header">
+                <h3><i class="fas fa-lightbulb"></i> Guia Rápido: Questionários</h3>
+                <button class="btn-collapse"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="guide-content">
+                <p>Os questionários são uma ferramenta poderosa para avaliação de conhecimento e coleta de feedback dos estudantes.</p>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Crie um questionário</h4>
+                            <p>Clique em "Novo Questionário" e defina título, descrição e tipo.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Adicione questões</h4>
+                            <p>Escolha entre múltipla escolha, verdadeiro/falso ou dissertativas.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Configure as opções</h4>
+                            <p>Defina tempo limite, pontuação e feedback automático.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Publique e compartilhe</h4>
+                            <p>Publique o questionário e compartilhe com os estudantes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">Todos os Questionários</div>
+            <div class="tab">Questionários Ativos</div>
+            <div class="tab">Questionários Arquivados</div>
+            <div class="tab">Rascunhos</div>
+        </div>
+
+        <div class="questionarios-container">
+            <div class="questionarios-header">
+                <h2 class="questionarios-title">Gerenciar Questionários</h2>
+                <div class="questionarios-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Pesquisar questionários...">
+                    </div>
+                    <div class="filter-dropdown">
+                        <button class="filter-btn">
+                            <i class="fas fa-filter"></i>
+                            Filtrar
+                        </button>
+                    </div>
+                    <button class="btn btn-primary" id="btn-novo-questionario">
+                        <i class="fas fa-plus"></i>
+                        Novo Questionário
+                    </button>
+                </div>
+            </div>
+
+            <div class="questionarios-list">
+                <!-- Questionário Item 1 -->
+                <div class="questionario-item">
+                    <div class="questionario-info">
+                        <h3 class="questionario-title">Avaliação de Conhecimentos: Fundamentos de Programação</h3>
+                        <div class="questionario-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Criado em: 15/05/2023</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Duração: 30 minutos</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-list-ol"></i>
+                                <span>20 questões</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>105 respostas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="questionario-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questionário Item 2 -->
+                <div class="questionario-item">
+                    <div class="questionario-info">
+                        <h3 class="questionario-title">Quiz de Algoritmos e Estruturas de Dados</h3>
+                        <div class="questionario-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Criado em: 02/06/2023</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Duração: 45 minutos</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-list-ol"></i>
+                                <span>15 questões</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>78 respostas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="questionario-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questionário Item 3 -->
+                <div class="questionario-item">
+                    <div class="questionario-info">
+                        <h3 class="questionario-title">Prova Final: Desenvolvimento Web</h3>
+                        <div class="questionario-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Criado em: 10/07/2023</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Duração: 60 minutos</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-list-ol"></i>
+                                <span>25 questões</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>92 respostas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="questionario-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Novo Questionário -->
+    <div class="modal-overlay" id="modal-novo-questionario">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Criar Novo Questionário</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Título do Questionário</label>
+                    <input type="text" class="form-control" placeholder="Digite o título do questionário">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea class="form-control" placeholder="Descrição do questionário"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duração (minutos)</label>
+                    <input type="number" class="form-control" placeholder="Ex: 30">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Questionário</label>
+                    <select class="form-control">
+                        <option>Avaliação (Nota)</option>
+                        <option>Quiz (Sem Nota)</option>
+                        <option>Pesquisa</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="btn-cancelar">Cancelar</button>
+                <button class="btn btn-primary" id="btn-criar">Criar e Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript para interatividade
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Modal
+            const modal = document.getElementById('modal-novo-questionario');
+            const btnNovoQuestionario = document.getElementById('btn-novo-questionario');
+            const btnCancelar = document.getElementById('btn-cancelar');
+            const modalClose = document.querySelector('.modal-close');
+
+            btnNovoQuestionario.addEventListener('click', function() {
+                modal.classList.add('active');
+            });
+
+            function closeModal() {
+                modal.classList.remove('active');
+            }
+
+            btnCancelar.addEventListener('click', closeModal);
+            modalClose.addEventListener('click', closeModal);
+            
+            // Fechar o modal ao clicar fora dele
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Guia Rápido - Expandir/Colapsar
+            const guideHeader = document.querySelector('.guide-header');
+            const guideContent = document.querySelector('.guide-content');
+            const btnCollapse = document.querySelector('.btn-collapse');
+
+            guideHeader.addEventListener('click', function() {
+                const isExpanded = guideContent.style.display !== 'none';
+                guideContent.style.display = isExpanded ? 'none' : 'block';
+                btnCollapse.innerHTML = isExpanded ? '<i class="fas fa-chevron-down"></i>' : '<i class="fas fa-chevron-up"></i>';
+            });
+
+            // Animação para estatísticas
+            const statValues = document.querySelectorAll('.stat-value');
+            
+            // Função para animar contagem
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    let value = Math.floor(progress * (end - start) + start);
+                    
+                    // Se for porcentagem, adicione o símbolo
+                    if (obj.textContent.includes('%')) {
+                        obj.textContent = value + '%';
+                    } else {
+                        // Se for número grande, formate com pontos ou vírgulas
+                        obj.textContent = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    }
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // Animar cada valor estatístico
+            statValues.forEach(statValue => {
+                const finalValue = parseInt(statValue.textContent.replace(/\D/g, ''));
+                statValue.textContent = '0';
+                animateValue(statValue, 0, finalValue, 1500);
+            });
+        });
+    </script>
+</body>
+</html> 

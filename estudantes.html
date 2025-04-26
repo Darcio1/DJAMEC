@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Estudantes | Sistema Educacional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="../css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --primary-color: #f59e0b;
+            --primary-light: #fcd34d;
+            --primary-dark: #d97706;
+            --accent-color: #fb923c;
+            --accent-dark: #ea580c;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --bg-sidebar: #ffffff;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            --gradient-secondary: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            --animation-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--gradient-primary);
+            box-shadow: var(--card-shadow);
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all var(--animation-speed);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Tabs Styles */
+        .tabs {
+            display: flex;
+            background-color: var(--bg-white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all var(--animation-speed);
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0;
+            transition: opacity var(--animation-speed);
+            z-index: -1;
+        }
+
+        .tab:hover:before {
+            opacity: 0.5;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab.active:before {
+            opacity: 1;
+        }
+
+        /* Containers */
+        .estudantes-container {
+            background-color: var(--bg-white);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform var(--animation-speed);
+            position: relative;
+        }
+
+        .estudantes-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .estudantes-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-light);
+        }
+
+        .estudantes-title {
+            font-size: 1.25rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .estudantes-title i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .estudantes-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Search and Filter Styles */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(255, 149, 0, 0.1);
+        }
+
+        .search-box:focus-within {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        .search-box i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            background-color: white;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(255, 149, 0, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--animation-speed);
+            border: none;
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: translate(-50%, -50%) scale(1);
+            transition: opacity 1s, transform 0.5s;
+        }
+
+        .btn:active:after {
+            animation: ripple 0.6s;
+            opacity: 1;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(50);
+                opacity: 0;
+            }
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ffb74d 0%, #ff8f00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--primary-color);
+        }
+
+        /* Tabela de Estudantes */
+        .estudantes-table-container {
+            padding: 1.25rem;
+            overflow-x: auto;
+        }
+
+        .estudantes-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .estudantes-table th {
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            background-color: var(--bg-light);
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .estudantes-table th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .estudantes-table th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .estudantes-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .estudantes-table tr:hover {
+            background-color: rgba(247, 247, 247, 0.5);
+        }
+        
+        .estudantes-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .estudante-photo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .status-badge i {
+            font-size: 0.7rem;
+        }
+
+        .badge-active {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-pending {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--bg-light);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 149, 0, 0.3);
+        }
+        
+        .view-btn:hover {
+            background-color: var(--info-color);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .delete-btn:hover {
+            background-color: var(--danger-color);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Cartões de dados de estudantes */
+        .estudantes-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label i {
+            color: var(--primary-color);
+        }
+
+        .stat-trend {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-trend.positive {
+            color: var(--success-color);
+        }
+
+        .stat-trend.negative {
+            color: var(--danger-color);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .pagination-item {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            border: 1px solid var(--border-color);
+            background-color: white;
+        }
+
+        .pagination-item:hover {
+            background-color: var(--bg-light);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--animation-speed);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: var(--bg-white);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateY(50px) scale(0.95);
+            transition: all var(--animation-speed);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gradient-secondary);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all var(--animation-speed);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--primary-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background-color: var(--bg-light);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            background-color: var(--bg-white);
+            transition: all var(--animation-speed);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Formulário de duas colunas */
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* Input de upload de foto */
+        .photo-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border: 2px dashed var(--border-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-upload-btn {
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+        }
+
+        .photo-upload-input {
+            display: none;
+        }
+
+        /* Progress bar para upload */
+        .upload-progress {
+            width: 100%;
+            height: 5px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .upload-progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Dashboard de estudante individual */
+        .estudante-perfil {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background-color: var(--bg-white);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .perfil-sidebar {
+            flex: 0 0 250px;
+        }
+
+        .perfil-content {
+            flex: 1;
+        }
+
+        .perfil-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 4px solid var(--border-color);
+        }
+
+        .perfil-nome {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-dark);
+        }
+
+        .perfil-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .perfil-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .perfil-info-item i {
+            color: var(--primary-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        .perfil-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .perfil-action-btn {
+            padding: 0.75rem;
+            border-radius: 10px;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .perfil-action-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        .perfil-action-btn i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animação para o modal de exclusão */
+        @keyframes scaleIn {
+            0% { 
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Background elements */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .circle-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .estudantes-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .estudante-perfil {
+                flex-direction: column;
+            }
+            
+            .perfil-sidebar {
+                flex: 0 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .perfil-actions {
+                max-width: 300px;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .estudantes-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .estudantes-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .estudantes-table th:nth-child(4),
+            .estudantes-table td:nth-child(4) {
+                display: none;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .estudantes-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .estudantes-table th:nth-child(3),
+            .estudantes-table td:nth-child(3) {
+                display: none;
+            }
+        }
+
+        /* Estilos para notificações */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            max-width: 450px;
+            padding: 12px 15px;
+            background-color: #fff;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .notification.success {
+            border-left-color: #4CAF50;
+        }
+        
+        .notification.success i {
+            color: #4CAF50;
+        }
+        
+        .notification.error {
+            border-left-color: #F44336;
+        }
+        
+        .notification.error i {
+            color: #F44336;
+        }
+        
+        .notification.alert {
+            border-left-color: #FF9800;
+        }
+        
+        .notification.alert i {
+            color: #FF9800;
+        }
+        
+        .notification.info {
+            border-left-color: #2196F3;
+        }
+        
+        .notification.info i {
+            color: #2196F3;
+        }
+        
+        .notification-message {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+        
+        .notification-close:hover {
+            color: #555;
+        }
+        
+        /* Animação para entradas vazias */
+        .empty-table-message {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Estilo para animação de remoção de linhas */
+        .estudantes-table tbody tr {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .estudantes-table tbody tr.removing {
+            background-color: rgba(239, 68, 68, 0.1);
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        /* Estilos para o modal de exclusão */
+        .modal-delete .modal-content {
+            border-top: 4px solid #ff3b30;
+            animation: scaleIn 0.3s ease forwards;
+        }
+
+        .modal-delete .modal-header {
+            background-color: #fff8f8;
+        }
+
+        .modal-delete .modal-header h3 {
+            color: #d9534f;
+        }
+
+        .modal-delete .modal-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal-delete .modal-body i {
+            font-size: 48px;
+            color: #ff3b30;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .modal-delete .modal-body p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .modal-delete .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-delete .action-buttons .cancel-button {
+            background-color: #f1f1f1;
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-delete .action-buttons .cancel-button:hover {
+            background-color: #e1e1e1;
+        }
+
+        .modal-delete .action-buttons .delete-button {
+            background-color: #ff3b30;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-delete .action-buttons .delete-button:hover {
+            background-color: #d9302c;
+        }
+
+        .modal-delete .action-buttons .delete-button.confirm-delete {
+            animation: shake 0.5s ease;
+        }
+
+        /* Animações para os modais e notificações */
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+        
+        /* Estilo para o botão no momento da confirmação de exclusão */
+        .delete-button.confirm-delete {
+            background-color: #ff3333;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transform: scale(1.05);
+        }
+        
+        /* Contador de estudantes */
+        .student-counter {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        /* Estilo para as linhas da tabela de estudantes */
+        .student-row {
+            transition: all 0.3s ease;
+        }
+
+        @keyframes fadeOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animação para remoção de linha da tabela */
+        .removing {
+            animation: fadeOutUp 0.5s ease forwards;
+            background-color: var(--color-danger-light) !important;
+        }
+
+        /* Estilo para mensagem de tabela vazia */
+        .empty-table-message {
+            color: var(--color-text-muted);
+            font-style: italic;
+            animation: slideInDown 0.5s ease forwards;
+        }
+
+        /* Melhorias para botões de ação na tabela */
+        .delete-btn, [title="Excluir"] {
+            color: var(--color-danger);
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover, [title="Excluir"]:hover {
+            color: var(--color-danger-dark);
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Container de notificações -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <!-- Elementos decorativos de fundo -->
+    <div class="background-elements">
+        <div class="circle-element" style="top: 20%; left: 5%; width: 300px; height: 300px; background: linear-gradient(135deg, rgba(255, 236, 179, 0.3) 0%, rgba(255, 167, 38, 0.3) 100%); filter: blur(40px);"></div>
+        <div class="circle-element" style="top: 60%; right: 8%; width: 250px; height: 250px; background: linear-gradient(135deg, rgba(255, 204, 128, 0.3) 0%, rgba(255, 149, 0, 0.3) 100%); filter: blur(40px);"></div>
+        <div class="circle-element" style="bottom: 10%; left: 15%; width: 200px; height: 200px; background: linear-gradient(135deg, rgba(255, 167, 38, 0.3) 0%, rgba(255, 109, 0, 0.3) 100%); filter: blur(30px);"></div>
+    </div>
+
+    <header>
+        <div class="header-title">
+            <h1><i class="fas fa-users"></i> Gerenciamento de Estudantes</h1>
+        </div>
+        <div class="header-actions">
+            <a href="dashboard-admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <div class="tab active" data-tab="lista">Lista de Estudantes</div>
+            <div class="tab" data-tab="matriculas">Matrículas</div>
+            <div class="tab" data-tab="desempenho">Desempenho</div>
+        </div>
+        
+        <!-- Tab Content: Lista de Estudantes -->
+        <div class="tab-content" id="listaTab">
+            <div class="estudantes-stats">
+                <div class="stat-card">
+                    <div class="stat-value">256</div>
+                    <div class="stat-label">
+                        <i class="fas fa-users"></i>
+                        <span>Estudantes Ativos</span>
+                    </div>
+                    <div class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12% este mês</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">35</div>
+                    <div class="stat-label">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Novos Registros</span>
+                    </div>
+                    <div class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>8% este mês</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Taxa de Presença</span>
+                    </div>
+                    <div class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>3% este mês</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Formandos</span>
+                    </div>
+                    <div class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12% este mês</span>
+                    </div>
+                </div>
+    </div>
+</div>
+</div>
+
+<div class="estudantes-container">
+<div class="estudantes-header">
+            <h3 class="estudantes-title"><i class="fas fa-graduation-cap"></i> Estudantes Cadastrados</h3>
+    <div class="estudantes-actions">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchEstudantes" placeholder="Pesquisar estudantes...">
+        </div>
+        <select class="filter-select">
+            <option value="all">Todos os status</option>
+            <option value="active">Ativos</option>
+            <option value="inactive">Inativos</option>
+            <option value="pending">Pendentes</option>
+        </select>
+        <select class="filter-select">
+            <option value="recent">Mais recentes</option>
+            <option value="az">A-Z</option>
+            <option value="za">Z-A</option>
+        </select>
+        <button id="addEstudanteBtn" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Novo Estudante
+        </button>
+    </div>
+</div>
+
+<div class="estudantes-table-container">
+    <table class="estudantes-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Estudante</th>
+                <th>Curso</th>
+                <th>Data da Matrícula</th>
+                <th>Cadeiras</th>
+                <th>Situação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Matrícula 1 -->
+            <tr>
+                <td>M-1001</td>
+                <td>João Silva</td>
+                <td>Ciência da Computação</td>
+                <td>12/02/2024</td>
+                <td>5 cadeiras</td>
+                <td><span class="status-badge badge-active">Confirmada</span></td>
+                <td class="actions-cell">
+                    <button class="action-btn" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn" title="Imprimir">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </td>
+            </tr>
+            
+            <!-- Matrícula 2 -->
+            <tr>
+                <td>M-1002</td>
+                <td>Maria Oliveira</td>
+                <td>Engenharia de Software</td>
+                <td>05/03/2024</td>
+                <td>6 cadeiras</td>
+                <td><span class="status-badge badge-active">Confirmada</span></td>
+                <td class="actions-cell">
+                    <button class="action-btn" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn" title="Imprimir">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </td>
+            </tr>
+            
+            <!-- Matrícula 3 -->
+            <tr>
+                <td>M-1003</td>
+                <td>Carlos Ferreira</td>
+                <td>Análise de Sistemas</td>
+                <td>10/03/2024</td>
+                <td>4 cadeiras</td>
+                <td><span class="status-badge badge-pending">Pendente</span></td>
+                <td class="actions-cell">
+                    <button class="action-btn" title="Ver detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn" title="Aprovar">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+        </div>
+    </div>
+
+    <!-- Tab Content: Matrículas -->
+    <div class="tab-content" id="matriculasTab" style="display: none;">
+        <div class="estudantes-container">
+            <div class="estudantes-header">
+                <h3 class="estudantes-title"><i class="fas fa-clipboard-list"></i> Matrículas Recentes</h3>
+                <div class="estudantes-actions">
+                    <select class="filter-select">
+                        <option value="all">Todos os cursos</option>
+                        <option value="cc">Ciência da Computação</option>
+                        <option value="es">Engenharia de Software</option>
+                        <option value="ec">Engenharia Civil</option>
+                        <option value="as">Análise de Sistemas</option>
+                    </select>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-file-export"></i>
+                        Exportar Dados
+                    </button>
+                </div>
+</div>
+</div>
+</div>
+
+<!-- Tab Content: Desempenho -->
+<div class="tab-content" id="desempenhoTab" style="display: none;">
+<div class="estudantes-container">
+<div class="estudantes-header">
+                <h3 class="estudantes-title"><i class="fas fa-chart-line"></i> Desempenho Acadêmico</h3>
+    <div class="estudantes-actions">
+        <select class="filter-select">
+            <option value="semester">Semestre Atual</option>
+            <option value="year">Ano Inteiro</option>
+            <option value="all">Histórico Completo</option>
+        </select>
+        <button class="btn btn-primary">
+            <i class="fas fa-chart-line"></i>
+            Gerar Relatório
+        </button>
+    </div>
+</div>
+
+<div style="padding: 2rem;">
+    <canvas id="desempenhoChart" style="width: 100%; height: 400px;"></canvas>
+</div>
+</div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sistema de notificações
+    function showNotification(message, type = 'info') {
+        const container = document.getElementById('notification-container');
+        
+        // Criar elemento de notificação
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        
+        // Ícone baseado no tipo
+        let icon = 'info-circle';
+        if (type === 'success') icon = 'check-circle';
+        if (type === 'error') icon = 'times-circle';
+        if (type === 'alert') icon = 'exclamation-circle';
+        
+        // Conteúdo da notificação
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${icon}"></i>
+                <span class="notification-message">${message}</span>
+    </div>
+            <button class="notification-close">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        // Adicionar ao container
+        container.appendChild(notification);
+        
+        // Animar entrada
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Configurar botão de fechar
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto-remover após 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    // Implementação do modal de exclusão
+    let currentRowToDelete = null;
+    
+    // Adicionar evento de clique aos botões de exclusão existentes
+    document.querySelectorAll('.delete-btn, [title="Excluir"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            deleteRow(this);
+        });
+    });
+    
+    // Função para mostrar o modal de confirmação de exclusão
+    function deleteRow(button) {
+        const row = button.closest('tr');
+        currentRowToDelete = row;
+        
+        // Obter informações do estudante para mostrar no modal
+        const studentName = row.querySelector('td:nth-child(2)').textContent.trim();
+        const studentId = row.querySelector('td:nth-child(1)').textContent.trim();
+        
+        // Atualizar texto do modal de confirmação
+        document.getElementById('delete-student-name').textContent = studentName;
+        
+        // Mostrar o modal de confirmação
+        document.querySelector('.modal-overlay-delete').style.display = 'flex';
+    }
+    
+    // Botão de confirmação de exclusão
+    document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+        if (currentRowToDelete) {
+            // Obter o nome do estudante antes de excluir
+            const studentName = currentRowToDelete.querySelector('td:nth-child(2)').textContent.trim();
+            
+            // Adicionar classe para animar a remoção
+            currentRowToDelete.classList.add('removing');
+            
+            // Remover a linha após a animação
+            setTimeout(() => {
+                currentRowToDelete.remove();
+                
+                // Mostrar notificação de sucesso
+                showNotification(`Estudante ${studentName} excluído com sucesso!`, 'success');
+                
+                // Atualizar contadores se necessário
+                updateStudentCounters();
+            }, 500);
+            
+            // Fechar o modal
+            document.querySelector('.modal-overlay-delete').style.display = 'none';
+            currentRowToDelete = null;
+        }
+    });
+    
+    // Função para atualizar contadores após exclusão
+    function updateStudentCounters() {
+        // Atualizar estatísticas se necessário
+        const totalStudents = document.querySelectorAll('.estudantes-table tbody tr').length;
+        
+        // Se houver um elemento para contagem de estudantes, atualize-o
+        const studentCounter = document.querySelector('.stat-value');
+        if (studentCounter) {
+            studentCounter.textContent = totalStudents;
+        }
+    }
+    
+    // Botão de cancelar exclusão
+    document.getElementById('cancel-delete-btn').addEventListener('click', function() {
+        document.querySelector('.modal-overlay-delete').style.display = 'none';
+        currentRowToDelete = null;
+    });
+    
+    // Botão de fechar modal de exclusão
+    document.getElementById('closeDeleteModal').addEventListener('click', function() {
+        document.querySelector('.modal-overlay-delete').style.display = 'none';
+        currentRowToDelete = null;
+    });
+    
+    // Fechar o modal quando clicar fora dele
+    document.querySelectorAll('.modal-overlay, .modal-overlay-delete').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+                if (this.classList.contains('modal-overlay-delete')) {
+                    currentRowToDelete = null;
+                }
+            }
+        });
+    });
+
+// Controle de abas
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+tab.addEventListener('click', function() {
+    // Remove a classe active de todas as abas
+    tabs.forEach(t => t.classList.remove('active'));
+    
+    // Adiciona a classe active na aba clicada
+    this.classList.add('active');
+    
+    // Esconde todos os conteúdos de aba
+    tabContents.forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Mostra o conteúdo correspondente à aba clicada
+    const tabId = this.getAttribute('data-tab');
+    document.getElementById(tabId + 'Tab').style.display = 'block';
+    
+    // Se for a aba de desempenho, inicializa o gráfico
+    if (tabId === 'desempenho') {
+        initPerformanceChart();
+    }
+});
+});
+
+// Modal de adicionar/editar estudante
+const addEstudanteBtn = document.getElementById('addEstudanteBtn');
+
+    // Função para abrir o modal de estudante
+function openEstudanteModal() {
+        const estudanteModal = document.getElementById('estudanteModal');
+        if (estudanteModal) {
+estudanteModal.classList.add('active');
+document.body.style.overflow = 'hidden'; // Impede rolagem da página
+        }
+}
+
+    // Função para fechar o modal de estudante
+function closeEstudanteModal() {
+        const estudanteModal = document.getElementById('estudanteModal');
+        if (estudanteModal) {
+estudanteModal.classList.remove('active');
+document.body.style.overflow = ''; // Restaura rolagem da página
+        }
+}
+
+    // Evento para o botão de adicionar estudante
+if (addEstudanteBtn) {
+addEstudanteBtn.addEventListener('click', openEstudanteModal);
+    }
+    
+    // Eventos para fechar o modal de estudante
+    const closeEstudanteModalBtn = document.getElementById('closeEstudanteModal');
+    const cancelEstudanteBtn = document.getElementById('cancelEstudanteBtn');
+    
+    if (closeEstudanteModalBtn) {
+        closeEstudanteModalBtn.addEventListener('click', closeEstudanteModal);
+            }
+            
+            if (cancelEstudanteBtn) {
+                cancelEstudanteBtn.addEventListener('click', closeEstudanteModal);
+            }
+            
+            // Pesquisa de estudantes
+            const searchInput = document.getElementById('searchEstudantes');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const tableRows = document.querySelectorAll('.estudantes-table tbody tr');
+                    
+                    tableRows.forEach(row => {
+                let found = false;
+                // Procurar em todas as colunas de texto
+                row.querySelectorAll('td').forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                        found = true;
+                    }
+                });
+                
+                row.style.display = found ? '' : 'none';
+                    });
+                });
+            }
+            
+            // Inicialização do gráfico de desempenho
+            function initPerformanceChart() {
+                const ctx = document.getElementById('desempenhoChart');
+                
+                if (ctx && typeof Chart !== 'undefined') {
+                    // Verificar se já existe um gráfico
+                    if (window.performanceChart) {
+                        window.performanceChart.destroy();
+                    }
+                    
+                    // Dados para o gráfico
+                    const labels = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'];
+                    const datasets = [
+                        {
+                            label: 'Média Geral',
+                            data: [7.8, 7.9, 8.1, 8.3, 8.5, 8.4],
+                            borderColor: '#ff9500',
+                            backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Ciência da Computação',
+                            data: [8.2, 8.3, 8.5, 8.7, 8.9, 8.6],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Engenharia de Software',
+                            data: [7.5, 7.6, 7.9, 8.1, 8.3, 8.2],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ];
+                    
+                    // Criação do gráfico
+                    window.performanceChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Média Acadêmica por Curso',
+                                    font: {
+                                        size: 16,
+                                        weight: 'bold'
+                                    },
+                                    padding: {
+                                        top: 10,
+                                        bottom: 30
+                                    }
+                                },
+                                legend: {
+                                    position: 'top',
+                                    align: 'center',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    titleColor: '#333',
+                                    bodyColor: '#666',
+                                    borderColor: '#ddd',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    displayColors: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    min: 6,
+                                    max: 10,
+                                    ticks: {
+                                        stepSize: 0.5
+                                    },
+                                    grid: {
+                                        drawBorder: false,
+                                        color: 'rgba(200, 200, 200, 0.2)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            },
+                            interaction: {
+                                intersect: false,
+                                mode: 'index'
+                            },
+                            elements: {
+                                point: {
+                                    radius: 4,
+                                    hoverRadius: 6
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+});
+</script>
+</body>
+</html>
+
+<!-- Modal para Adicionar/Editar Estudante -->
+<div class="modal-overlay" id="estudanteModal">
+<div class="modal-container">
+<div class="modal-header">
+<h3 class="modal-title">Adicionar Novo Estudante</h3>
+<button class="modal-close" id="closeEstudanteModal">&times;</button>
+</div>
+<div class="modal-body">
+<form id="estudanteForm">
+    <div class="photo-upload">
+        <div class="photo-preview" id="photoPreview">
+            <i class="fas fa-user" id="photoPlaceholder"></i>
+            <img id="photoImage" style="display: none;">
+        </div>
+        <label for="photoInput" class="photo-upload-btn">Escolher Foto</label>
+        <input type="file" id="photoInput" class="photo-upload-input" accept="image/*">
+        <div class="upload-progress">
+            <div class="upload-progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-col">
+            <div class="form-group">
+                <label for="nomeEstudante" class="form-label">Nome Completo</label>
+                <input type="text" id="nomeEstudante" class="form-input" placeholder="Ex: João Silva">
+            </div>
+        </div>
+        <div class="form-col">
+            <div class="form-group">
+                <label for="emailEstudante" class="form-label">E-mail</label>
+                <input type="email" id="emailEstudante" class="form-input" placeholder="Ex: joao.silva@email.com">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-col">
+            <div class="form-group">
+                <label for="telEstudante" class="form-label">Telefone</label>
+                <input type="tel" id="telEstudante" class="form-input" placeholder="Ex: (11) 98765-4321">
+            </div>
+        </div>
+        <div class="form-col">
+            <div class="form-group">
+                <label for="dataNascEstudante" class="form-label">Data de Nascimento</label>
+                <input type="date" id="dataNascEstudante" class="form-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-col">
+            <div class="form-group">
+                <label for="cursoEstudante" class="form-label">Curso</label>
+                <select id="cursoEstudante" class="form-select">
+                    <option value="">Selecione um curso</option>
+                    <option value="cc">Ciência da Computação</option>
+                    <option value="es">Engenharia de Software</option>
+                    <option value="ec">Engenharia Civil</option>
+                    <option value="as">Análise de Sistemas</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-col">
+            <div class="form-group">
+                <label for="statusEstudante" class="form-label">Status</label>
+                <select id="statusEstudante" class="form-select">
+                    <option value="active">Ativo</option>
+                    <option value="inactive">Inativo</option>
+                    <option value="pending">Pendente</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="enderecoEstudante" class="form-label">Endereço</label>
+        <input type="text" id="enderecoEstudante" class="form-input" placeholder="Ex: Rua das Flores, 123">
+    </div>
+
+    <div class="form-row">
+        <div class="form-col">
+            <div class="form-group">
+                <label for="cidadeEstudante" class="form-label">Cidade</label>
+                <input type="text" id="cidadeEstudante" class="form-input" placeholder="Ex: São Paulo">
+            </div>
+        </div>
+        <div class="form-col">
+            <div class="form-group">
+                <label for="estadoEstudante" class="form-label">Estado</label>
+                <input type="text" id="estadoEstudante" class="form-input" placeholder="Ex: SP">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="observacoesEstudante" class="form-label">Observações</label>
+        <textarea id="observacoesEstudante" class="form-textarea" placeholder="Informações adicionais sobre o estudante..."></textarea>
+    </div>
+</form>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" id="cancelEstudanteBtn">Cancelar</button>
+<button class="btn btn-primary" id="saveEstudanteBtn">Salvar Estudante</button>
+</div>
+</div>
+</div>
+
+<!-- Modal para Visualizar Detalhes do Estudante -->
+<div class="modal-overlay" id="detalhesModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Detalhes do Estudante</h2>
+            <span class="close-modal" data-modal="detalhesModal">&times;</span>
+        </div>
+        <div class="modal-body" id="detalhesEstudante">
+            <!-- O conteúdo será preenchido dinamicamente -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary close-modal" data-modal="detalhesModal">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Confirmar Exclusão de Estudante -->
+<div class="modal-overlay modal-overlay-delete" id="deleteModal" style="display: none;">
+    <div class="modal-container" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Confirmar Exclusão</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body modal-body-delete">
+            <p>Tem certeza que deseja excluir o estudante <strong id="delete-student-name"></strong>?</p>
+            <p style="color: #ef4444; margin-top: 10px;"><i class="fas fa-exclamation-triangle"></i> Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-delete-btn">Cancelar</button>
+            <button class="btn btn-primary" id="confirm-delete-btn" style="background: #ef4444; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-trash-alt"></i> Excluir
+            </button>
+        </div>
+    </div>
+</div>
